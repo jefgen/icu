@@ -60,6 +60,9 @@
     <ClCompile Include="dayperiodrules.cpp">
       <Filter>formatting</Filter>
     </ClCompile>
+    <ClCompile Include="erarules.cpp">
+      <Filter>formatting</Filter>
+    </ClCompile>
     <ClCompile Include="decimfmtimpl.cpp">
       <Filter>formatting</Filter>
     </ClCompile>
@@ -1413,5 +1416,8 @@
     <CustomBuild Include="unicode\numberformatter.h">
       <Filter>formatting</Filter>
     </CustomBuild>
+    <ClInclude Include="erarules.h">
+      <Filter>formatting</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

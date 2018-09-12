@@ -59,6 +59,7 @@
 #include "dcfmtest.h"       // DecimalFormatTest
 #include "listformattertest.h"  // ListFormatterTest
 #include "regiontst.h"      // RegionTest
+#include "erarulestest.h"   // EraRulesTest
 
 // NumberFormatter is disabled on some platforms due to C++11 compatibility
 #if !UPRV_INCOMPLETE_CPP11_SUPPORT
@@ -239,6 +240,7 @@ void IntlTestFormat::runIndexedTest( int32_t index, UBool exec, const char* &nam
           } 
           break;
         TESTCLASS(51,NumberTest);
+        TESTCLASS(52,EraRulesTest);
         default: name = ""; break; //needed to end loop
     }
     if (exec) {

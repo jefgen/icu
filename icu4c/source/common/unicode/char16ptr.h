@@ -52,10 +52,10 @@ public:
      */
     inline Char16Ptr(uint16_t *p);
 #endif
-#if U_SIZEOF_WCHAR_T==2 || defined(U_IN_DOXYGEN)
+#if (U_SIZEOF_WCHAR_T==2 && !defined(_MSC_VER)) || (U_SIZEOF_WCHAR_T==2 && defined(_MSC_VER) && defined(_NATIVE_WCHAR_T_DEFINED)) || defined(U_IN_DOXYGEN)
     /**
      * Converts the pointer to char16_t *.
-     * (Only defined if U_SIZEOF_WCHAR_T==2.)
+     * (Only defined if U_SIZEOF_WCHAR_T==2, and for MSVC, only if wchar_t is a native type.)
      * @param p pointer to be converted
      * @stable ICU 59
      */
@@ -112,7 +112,7 @@ Char16Ptr::Char16Ptr(char16_t *p) : p_(p) {}
 #if !U_CHAR16_IS_TYPEDEF
 Char16Ptr::Char16Ptr(uint16_t *p) : p_(cast(p)) {}
 #endif
-#if U_SIZEOF_WCHAR_T==2
+#if (U_SIZEOF_WCHAR_T==2 && !defined(_MSC_VER)) || (U_SIZEOF_WCHAR_T==2 && defined(_MSC_VER) && defined(_NATIVE_WCHAR_T_DEFINED))
 Char16Ptr::Char16Ptr(wchar_t *p) : p_(cast(p)) {}
 #endif
 Char16Ptr::Char16Ptr(std::nullptr_t p) : p_(p) {}
@@ -128,7 +128,7 @@ Char16Ptr::Char16Ptr(char16_t *p) { u_.cp = p; }
 #if !U_CHAR16_IS_TYPEDEF
 Char16Ptr::Char16Ptr(uint16_t *p) { u_.up = p; }
 #endif
-#if U_SIZEOF_WCHAR_T==2
+#if (U_SIZEOF_WCHAR_T==2 && !defined(_MSC_VER)) || (U_SIZEOF_WCHAR_T==2 && defined(_MSC_VER) && defined(_NATIVE_WCHAR_T_DEFINED))
 Char16Ptr::Char16Ptr(wchar_t *p) { u_.wp = p; }
 #endif
 Char16Ptr::Char16Ptr(std::nullptr_t p) { u_.cp = p; }
@@ -159,7 +159,7 @@ public:
      */
     inline ConstChar16Ptr(const uint16_t *p);
 #endif
-#if U_SIZEOF_WCHAR_T==2 || defined(U_IN_DOXYGEN)
+#if (U_SIZEOF_WCHAR_T==2 && !defined(_MSC_VER)) || (U_SIZEOF_WCHAR_T==2 && defined(_MSC_VER) && defined(_NATIVE_WCHAR_T_DEFINED)) || defined(U_IN_DOXYGEN)
     /**
      * Converts the pointer to char16_t *.
      * (Only defined if U_SIZEOF_WCHAR_T==2.)
@@ -220,7 +220,7 @@ ConstChar16Ptr::ConstChar16Ptr(const char16_t *p) : p_(p) {}
 #if !U_CHAR16_IS_TYPEDEF
 ConstChar16Ptr::ConstChar16Ptr(const uint16_t *p) : p_(cast(p)) {}
 #endif
-#if U_SIZEOF_WCHAR_T==2
+#if (U_SIZEOF_WCHAR_T==2 && !defined(_MSC_VER)) || (U_SIZEOF_WCHAR_T==2 && defined(_MSC_VER) && defined(_NATIVE_WCHAR_T_DEFINED))
 ConstChar16Ptr::ConstChar16Ptr(const wchar_t *p) : p_(cast(p)) {}
 #endif
 ConstChar16Ptr::ConstChar16Ptr(const std::nullptr_t p) : p_(p) {}
@@ -236,7 +236,7 @@ ConstChar16Ptr::ConstChar16Ptr(const char16_t *p) { u_.cp = p; }
 #if !U_CHAR16_IS_TYPEDEF
 ConstChar16Ptr::ConstChar16Ptr(const uint16_t *p) { u_.up = p; }
 #endif
-#if U_SIZEOF_WCHAR_T==2
+#if (U_SIZEOF_WCHAR_T==2 && !defined(_MSC_VER)) || (U_SIZEOF_WCHAR_T==2 && defined(_MSC_VER) && defined(_NATIVE_WCHAR_T_DEFINED))
 ConstChar16Ptr::ConstChar16Ptr(const wchar_t *p) { u_.wp = p; }
 #endif
 ConstChar16Ptr::ConstChar16Ptr(const std::nullptr_t p) { u_.cp = p; }

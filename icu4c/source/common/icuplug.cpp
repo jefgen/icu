@@ -197,7 +197,7 @@ uplug_openLibrary(const char *libName, UErrorCode *status) {
       libraryCount--;
     } else { /* is it still there? */
       /* link it in */
-      uprv_strncpy(libraryList[libEntry].name,libName,UPLUG_NAME_MAX);
+      uprv_strlcpy(libraryList[libEntry].name,libName,UPLUG_NAME_MAX);
       libraryList[libEntry].ref=1;
       lib = libraryList[libEntry].lib;
     }
@@ -368,13 +368,13 @@ static UPlugData *uplug_allocatePlug(UPlugEntrypoint *entrypoint, const char *co
   }
 
   if(config!=NULL) {
-    uprv_strncpy(plug->config, config, UPLUG_NAME_MAX);
+    uprv_strlcpy(plug->config, config, UPLUG_NAME_MAX);
   } else {
     plug->config[0] = 0;
   }
     
   if(symName!=NULL) {
-    uprv_strncpy(plug->sym, symName, UPLUG_NAME_MAX);
+    uprv_strlcpy(plug->sym, symName, UPLUG_NAME_MAX);
   } else {
     plug->sym[0] = 0;
   }
@@ -458,7 +458,7 @@ uplug_getPlugLevel(UPlugData *data) {
 
 U_CAPI void U_EXPORT2
 uplug_setPlugName(UPlugData *data, const char *name) {
-  uprv_strncpy(data->name, name, UPLUG_NAME_MAX);
+  uprv_strlcpy(data->name, name, UPLUG_NAME_MAX);
 }
 
 
@@ -562,19 +562,19 @@ uplug_initErrorPlug(const char *libName, const char *sym, const char *config, co
   plug->dontUnload = TRUE; /* cannot unload. */
 
   if(sym!=NULL) {
-    uprv_strncpy(plug->sym, sym, UPLUG_NAME_MAX);
+    uprv_strlcpy(plug->sym, sym, UPLUG_NAME_MAX);
   }
 
   if(libName!=NULL) {
-    uprv_strncpy(plug->libName, libName, UPLUG_NAME_MAX);
+    uprv_strlcpy(plug->libName, libName, UPLUG_NAME_MAX);
   }
 
   if(nameOrError!=NULL) {
-    uprv_strncpy(plug->name, nameOrError, UPLUG_NAME_MAX);
+    uprv_strlcpy(plug->name, nameOrError, UPLUG_NAME_MAX);
   }
 
   if(config!=NULL) {
-    uprv_strncpy(plug->config, config, UPLUG_NAME_MAX);
+    uprv_strlcpy(plug->config, config, UPLUG_NAME_MAX);
   }
 
   return plug;
@@ -782,7 +782,7 @@ uplug_init(UErrorCode *status) {
     /* plugin_file is not used for processing - it is only used 
        so that uplug_getPluginFile() works (i.e. icuinfo)
     */
-    uprv_strncpy(plugin_file, pluginFile.data(), sizeof(plugin_file));
+    uprv_strlcpy(plugin_file, pluginFile.data(), sizeof(plugin_file));
         
 #if UPLUG_TRACE
     DBG((stderr, "pluginfile= %s len %d/%d\n", plugin_file, (int)strlen(plugin_file), (int)sizeof(plugin_file)));

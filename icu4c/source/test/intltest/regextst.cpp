@@ -144,7 +144,7 @@ static void utextToPrintable(char *buf, int32_t bufLen, UText *text) {
 #if (U_CHARSET_FAMILY==U_EBCDIC_FAMILY)
   char *ebuf = (char*)malloc(bufLen);
   uprv_eastrncpy((unsigned char*)ebuf, (const unsigned char*)buf, bufLen);
-  uprv_strncpy(buf, ebuf, bufLen);
+  uprv_strlcpy(buf, ebuf, bufLen);
   free((void*)ebuf);
 #endif
   utext_setNativeIndex(text, oldIndex);

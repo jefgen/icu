@@ -1048,8 +1048,8 @@ bundle_write_xml(struct SRBRoot *bundle, const char *outputDir,const char* outpu
     }
     index = (int32_t)(uprv_strlen(filename) - uprv_strlen(textExt) - first);
     originalFileName = (char *)uprv_malloc(sizeof(char)*index+1);
-    uprv_memset(originalFileName, 0, sizeof(char)*index+1);
-    uprv_strncpy(originalFileName, filename + first, index);
+    //uprv_memset(originalFileName, 0, sizeof(char)*index+1);
+    uprv_strlcpy(originalFileName, filename + first, index+1);
 
     if(uprv_strcmp(originalFileName, srBundle->fLocale) != 0) {
         fprintf(stdout, "Warning: The file name is not same as the resource name!\n");
@@ -1125,7 +1125,8 @@ bundle_write_xml(struct SRBRoot *bundle, const char *outputDir,const char* outpu
     uprv_strcat(xmlfileName,xliffExt);
 
     if (writtenFilename) {
-        uprv_strncpy(writtenFilename, xmlfileName, writtenFilenameLen);
+        // TODO:jefgen: return error on trunc?
+        uprv_strlcpy(writtenFilename, xmlfileName, writtenFilenameLen);
     }
 
     if (U_FAILURE(*status)) {

@@ -115,8 +115,8 @@ class CacheKey : public CacheKeyBase {
     */
    virtual char *writeDescription(char *buffer, int32_t bufLen) const {
        const char *s = typeid(T).name();
-       uprv_strncpy(buffer, s, bufLen);
-       buffer[bufLen - 1] = 0;
+       uprv_strlcpy(buffer, s, bufLen);
+       //buffer[bufLen - 1] = 0;
        return buffer;
    }
 
@@ -168,8 +168,8 @@ class LocaleCacheKey : public CacheKey<T> {
     */
    virtual char *writeDescription(char *buffer, int32_t bufLen) const {
        const char *s = fLoc.getName();
-       uprv_strncpy(buffer, s, bufLen);
-       buffer[bufLen - 1] = 0;
+       uprv_strlcpy(buffer, s, bufLen);
+       //buffer[bufLen - 1] = 0;
        return buffer;
    }
 

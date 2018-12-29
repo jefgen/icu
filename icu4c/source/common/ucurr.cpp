@@ -376,12 +376,13 @@ struct CReg : public icu::UMemory {
     CReg(const UChar* _iso, const char* _id)
         : next(0)
     {
-        int32_t len = (int32_t)uprv_strlen(_id);
-        if (len > (int32_t)(sizeof(id)-1)) {
-            len = (sizeof(id)-1);
-        }
-        uprv_strncpy(id, _id, len);
-        id[len] = 0;
+        uprv_strlcpy(id, _id, ULOC_FULLNAME_CAPACITY);
+        // int32_t len = (int32_t)uprv_strlen(_id);
+        // if (len > (int32_t)(sizeof(id)-1)) {
+        //     len = (sizeof(id)-1);
+        // }
+        // uprv_strncpy(id, _id, len);
+        // id[len] = 0;
         u_memcpy(iso, _iso, ISO_CURRENCY_CODE_LENGTH);
         iso[ISO_CURRENCY_CODE_LENGTH] = 0;
     }

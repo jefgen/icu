@@ -172,7 +172,7 @@ UBool TextFile::ensureCapacity(int32_t mincapacity) {
         return FALSE;
     }
     if (buffer != 0) {
-        uprv_strncpy(newbuffer, buffer, capacity);
+        uprv_strlcpy(newbuffer, buffer, capacity);
         uprv_free(buffer);
     }
     buffer = newbuffer;

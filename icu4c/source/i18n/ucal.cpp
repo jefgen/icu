@@ -29,6 +29,8 @@
 #include "ulist.h"
 #include "ulocimp.h"
 
+#include "cpputils.h"
+
 U_NAMESPACE_USE
 
 static TimeZone*
@@ -152,7 +154,8 @@ ucal_open(  const UChar*  zoneID,
       if ( locale == NULL ) {
           locale = uloc_getDefault();
       }
-      uprv_strncpy(localeBuf, locale, ULOC_LOCALE_IDENTIFIER_CAPACITY);
+      // TODO:jefgen: return error on trunc?
+      uprv_strlcpy(localeBuf, locale, ULOC_LOCALE_IDENTIFIER_CAPACITY);
       uloc_setKeywordValue("calendar", "gregorian", localeBuf, ULOC_LOCALE_IDENTIFIER_CAPACITY, status);
       if (U_FAILURE(*status)) {
           return NULL;

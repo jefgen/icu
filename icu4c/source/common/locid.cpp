@@ -664,8 +664,8 @@ Locale::initBaseName(UErrorCode &status) {
             status = U_MEMORY_ALLOCATION_ERROR;
             return;
         }
-        uprv_strncpy(baseName, fullName, baseNameLength);
-        baseName[baseNameLength] = 0;
+        uprv_strlcpy(baseName, fullName, baseNameLength+1);
+        //baseName[baseNameLength] = 0;
 
         // The original computation of variantBegin leaves it equal to the length
         // of fullName if there is no variant.  It should instead be

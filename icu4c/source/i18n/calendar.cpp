@@ -837,8 +837,8 @@ Calendar::operator=(const Calendar &right)
         fWeekendCease            = right.fWeekendCease;
         fWeekendCeaseMillis      = right.fWeekendCeaseMillis;
         fNextStamp               = right.fNextStamp;
-        uprv_strncpy(validLocale, right.validLocale, sizeof(validLocale));
-        uprv_strncpy(actualLocale, right.actualLocale, sizeof(actualLocale));
+        uprv_strlcpy(validLocale, right.validLocale, sizeof(validLocale));
+        uprv_strlcpy(actualLocale, right.actualLocale, sizeof(actualLocale));
         validLocale[sizeof(validLocale)-1] = 0;
         actualLocale[sizeof(validLocale)-1] = 0;
     }
@@ -1021,6 +1021,7 @@ Calendar::getCalendarTypeFromLocale(
     if (U_FAILURE(success)) {
         return;
     }
+    // TODO: call strlcpy and check the return value?
     uprv_strncpy(typeBuffer, (*shared)->getType(), typeBufferSize);
     shared->removeRef();
     if (typeBuffer[typeBufferSize - 1]) {

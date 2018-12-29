@@ -1674,8 +1674,9 @@ _appendLDMLExtensionAsKeywords(const char* ldmlext, ExtensionListEntry** appendT
                     return;
                 }
 
-                uprv_strncpy(bcpKeyBuf, pBcpKey, bcpKeyLen);
-                bcpKeyBuf[bcpKeyLen] = 0;
+                uprv_strlcpy(bcpKeyBuf, pBcpKey, bcpKeyLen+1);
+                //uprv_strncpy(bcpKeyBuf, pBcpKey, bcpKeyLen);
+                //bcpKeyBuf[bcpKeyLen] = 0;
 
                 /* u extension key to LDML key */
                 pKey = uloc_toLegacyKey(bcpKeyBuf);
@@ -1708,8 +1709,9 @@ _appendLDMLExtensionAsKeywords(const char* ldmlext, ExtensionListEntry** appendT
                         return;
                     }
 
-                    uprv_strncpy(bcpTypeBuf, pBcpType, bcpTypeLen);
-                    bcpTypeBuf[bcpTypeLen] = 0;
+                    uprv_strlcpy(bcpTypeBuf, pBcpType, bcpTypeLen+1);
+                    //uprv_strncpy(bcpTypeBuf, pBcpType, bcpTypeLen);
+                    //bcpTypeBuf[bcpTypeLen] = 0;
 
                     /* BCP type to locale type */
                     pType = uloc_toLegacyType(pKey, bcpTypeBuf);

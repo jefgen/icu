@@ -259,8 +259,8 @@ ListFormatInternal* ListFormatter::loadListFormatInternal(
     }
     ListFormatter::ListPatternsSink sink;
     char currentStyle[kStyleLenMax+1];
-    uprv_strncpy(currentStyle, style, kStyleLenMax);
-    currentStyle[kStyleLenMax] = 0;
+    uprv_strlcpy(currentStyle, style, kStyleLenMax+1);
+    //currentStyle[kStyleLenMax] = 0;
 
     for (;;) {
         ures_getAllItemsWithFallback(rb, currentStyle, sink, errorCode);

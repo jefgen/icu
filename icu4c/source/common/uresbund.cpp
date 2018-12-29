@@ -648,8 +648,8 @@ static UResourceDataEntry *entryOpen(const char* path, const char* localeID,
         return NULL;
     }
 
-    uprv_strncpy(name, localeID, sizeof(name) - 1);
-    name[sizeof(name) - 1] = 0;
+    uprv_strlcpy(name, localeID, sizeof(name));
+    //name[sizeof(name) - 1] = 0;
 
     if ( usingUSRData ) {
         if ( path == NULL ) {

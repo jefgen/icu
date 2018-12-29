@@ -493,7 +493,7 @@ _ISO2022Open(UConverter *cnv, UConverterLoadArgs *pArgs, UErrorCode *errorCode){
         myConverterData->currentType = ASCII1;
         cnv->fromUnicodeStatus =FALSE;
         if(pArgs->locale){
-            uprv_strncpy(myLocale, pArgs->locale, sizeof(myLocale));
+            uprv_strlcpy(myLocale, pArgs->locale, sizeof(myLocale));
         }
         version = pArgs->options & UCNV_OPTIONS_VERSION_MASK;
         myConverterData->version = version;

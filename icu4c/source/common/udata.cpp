@@ -777,8 +777,8 @@ openCommonData(const char *path,          /*  Path from OpenChoice?          */
     if (!UDataMemory_isLoaded(&tData)) {
         char ourPathBuffer[1024];
         /* One more chance, for extendCommonData() */
-        uprv_strncpy(ourPathBuffer, path, 1019);
-        ourPathBuffer[1019]=0;
+        uprv_strlcpy(ourPathBuffer, path, 1019);
+        //ourPathBuffer[1019]=0;
         uprv_strcat(ourPathBuffer, ".dat");
         uprv_mapFile(&tData, ourPathBuffer, pErrorCode);
     }

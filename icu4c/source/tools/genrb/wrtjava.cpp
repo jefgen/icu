@@ -651,7 +651,8 @@ bundle_write_java(struct SRBRoot *bundle, const char *outputDir,const char* outp
     }
 
     if (writtenFilename) {
-        uprv_strncpy(writtenFilename, fileName, writtenFilenameLen);
+        // TODO:jefgen: return error on truncation.
+        uprv_strlcpy(writtenFilename, fileName, writtenFilenameLen);
     }
 
     if (U_FAILURE(*status)) {

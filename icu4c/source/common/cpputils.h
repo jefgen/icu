@@ -19,6 +19,7 @@
 #include "unicode/utypes.h"
 #include "unicode/unistr.h"
 #include "cmemory.h"
+#include "cstring.h"
 
 /*==========================================================================*/
 /* Array copy utility functions */
@@ -92,6 +93,21 @@ uprv_checkCanGetBuffer(const icu::UnicodeString &s, UErrorCode &errorCode) {
     if(U_SUCCESS(errorCode) && s.isBogus()) {
         errorCode=U_ILLEGAL_ARGUMENT_ERROR;
     }
+}
+
+/*==========================================================================*/
+/* String helpers */
+/*==========================================================================*/
+
+/**
+ * 
+ * 
+ * https://randomascii.wordpress.com/2013/04/03/stop-using-strncpy-already/
+ */
+template <size_t count>
+size_t uprv_strlcpy_s(char (&dest)[count], const char *src)
+{
+    return uprv_strlcpy(dest, src, count);
 }
 
 #endif /* _CPPUTILS */

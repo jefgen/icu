@@ -1637,11 +1637,12 @@ The leftmost codepage (.xxx) wins.
 
     // Copy the ID into owned memory.
     // Over-allocate in case we replace "@" with "__".
-    char *correctedPOSIXLocale = static_cast<char *>(uprv_malloc(uprv_strlen(posixID) + 1 + 1));
+    int32_t correctedPOSIXLocaleBufferLength = static_cast<int32_t>(uprv_strlen(posixID)) + 1 + 1;
+    char *correctedPOSIXLocale = static_cast<char *>(uprv_malloc(correctedPOSIXLocaleBufferLength));
     if (correctedPOSIXLocale == nullptr) {
         return nullptr;
     }
-    uprv_strcpy(correctedPOSIXLocale, posixID);
+    uprv_strlcpy(correctedPOSIXLocale, posixID, correctedPOSIXLocaleBufferLength);
 
     char *limit;
     if ((limit = uprv_strchr(correctedPOSIXLocale, '.')) != nullptr) {
@@ -2008,10 +2009,12 @@ getCodepageFromPOSIXID(const char *localeName, char * buffer, int32_t buffCapaci
 
     if (localeName != NULL && (name = (uprv_strchr(localeName, '.'))) != NULL) {
         size_t localeCapacity = uprv_min(sizeof(localeBuf), (name-localeName)+1);
-        uprv_strncpy(localeBuf, localeName, localeCapacity);
-        localeBuf[localeCapacity-1] = 0; /* ensure NULL termination */
-        name = uprv_strncpy(buffer, name+1, buffCapacity);
-        buffer[buffCapacity-1] = 0; /* ensure NULL termination */
+        uprv_strlcpy(localeBuf, localeName, localeCapacity);
+        //localeBuf[localeCapacity-1] = 0; /* ensure NULL termination */
+        //name = uprv_strncpy(buffer, name+1, buffCapacity);
+        uprv_strlcpy(buffer, name+1, buffCapacity);
+        name = buffer;
+        //buffer[buffCapacity-1] = 0; /* ensure NULL termination */
         if ((variant = const_cast<char *>(uprv_strchr(name, '@'))) != NULL) {
             *variant = 0;
         }
@@ -2115,8 +2118,8 @@ int_getDefaultCodepage()
         }
 
         if (codeset != NULL) {
-            uprv_strncpy(codesetName, codeset, sizeof(codesetName));
-            codesetName[sizeof(codesetName)-1] = 0;
+            uprv_strlcpy(codesetName, codeset, sizeof(codesetName));
+            //codesetName[sizeof(codesetName)-1] = 0;
             return codesetName;
         }
     }

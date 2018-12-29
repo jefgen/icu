@@ -204,14 +204,14 @@ BreakIterator::BreakIterator()
 }
 
 BreakIterator::BreakIterator(const BreakIterator &other) : UObject(other) {
-    uprv_strncpy(actualLocale, other.actualLocale, sizeof(actualLocale));
-    uprv_strncpy(validLocale, other.validLocale, sizeof(validLocale));
+    uprv_strlcpy(actualLocale, other.actualLocale, sizeof(actualLocale));
+    uprv_strlcpy(validLocale, other.validLocale, sizeof(validLocale));
 }
 
 BreakIterator &BreakIterator::operator =(const BreakIterator &other) {
     if (this != &other) {
-        uprv_strncpy(actualLocale, other.actualLocale, sizeof(actualLocale));
-        uprv_strncpy(validLocale, other.validLocale, sizeof(validLocale));
+        uprv_strlcpy(actualLocale, other.actualLocale, sizeof(actualLocale));
+        uprv_strlcpy(validLocale, other.validLocale, sizeof(validLocale));
     }
     return *this;
 }

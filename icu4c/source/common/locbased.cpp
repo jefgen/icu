@@ -40,11 +40,9 @@ void LocaleBased::setLocaleIDs(const char* validID, const char* actualID) {
     // TODO:jefgen: Set an error on truncation?
     if (validID != 0) {
       uprv_strlcpy(valid, validID, ULOC_FULLNAME_CAPACITY);
-      //valid[ULOC_FULLNAME_CAPACITY-1] = 0; // always terminate
     }
     if (actualID != 0) {
       uprv_strlcpy(actual, actualID, ULOC_FULLNAME_CAPACITY);
-      //actual[ULOC_FULLNAME_CAPACITY-1] = 0; // always terminate
     }
 }
 

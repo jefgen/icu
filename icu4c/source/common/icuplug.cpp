@@ -32,6 +32,7 @@
 #include <cics.h> /* 12 Nov 2011 JAM iscics() function */
 #endif
 #include "charstr.h"
+#include "cpputils.h"
 
 using namespace icu;
 
@@ -197,7 +198,7 @@ uplug_openLibrary(const char *libName, UErrorCode *status) {
       libraryCount--;
     } else { /* is it still there? */
       /* link it in */
-      uprv_strlcpy(libraryList[libEntry].name,libName,UPLUG_NAME_MAX);
+      uprv_strlcpy_s(libraryList[libEntry].name, libName);
       libraryList[libEntry].ref=1;
       lib = libraryList[libEntry].lib;
     }
@@ -368,13 +369,13 @@ static UPlugData *uplug_allocatePlug(UPlugEntrypoint *entrypoint, const char *co
   }
 
   if(config!=NULL) {
-    uprv_strlcpy(plug->config, config, UPLUG_NAME_MAX);
+    uprv_strlcpy_s(plug->config, config);
   } else {
     plug->config[0] = 0;
   }
     
   if(symName!=NULL) {
-    uprv_strlcpy(plug->sym, symName, UPLUG_NAME_MAX);
+    uprv_strlcpy_s(plug->sym, symName);
   } else {
     plug->sym[0] = 0;
   }
@@ -458,7 +459,7 @@ uplug_getPlugLevel(UPlugData *data) {
 
 U_CAPI void U_EXPORT2
 uplug_setPlugName(UPlugData *data, const char *name) {
-  uprv_strlcpy(data->name, name, UPLUG_NAME_MAX);
+  uprv_strlcpy_s(data->name, name);
 }
 
 
@@ -526,7 +527,7 @@ uplug_getPlugLoadStatus(UPlugData *plug) {
 
 
 /**
- * Initialize a plugin fron an entrypoint and library - but don't load it.
+ * Initialize a plugin from an entrypoint and library - but don't load it.
  */
 static UPlugData* uplug_initPlugFromEntrypointAndLibrary(UPlugEntrypoint *entrypoint, const char *config, void *lib, const char *sym,
                                                          UErrorCode *status) {
@@ -562,19 +563,19 @@ uplug_initErrorPlug(const char *libName, const char *sym, const char *config, co
   plug->dontUnload = TRUE; /* cannot unload. */
 
   if(sym!=NULL) {
-    uprv_strlcpy(plug->sym, sym, UPLUG_NAME_MAX);
+    uprv_strlcpy_s(plug->sym, sym);
   }
 
   if(libName!=NULL) {
-    uprv_strlcpy(plug->libName, libName, UPLUG_NAME_MAX);
+    uprv_strlcpy_s(plug->libName, libName);
   }
 
   if(nameOrError!=NULL) {
-    uprv_strlcpy(plug->name, nameOrError, UPLUG_NAME_MAX);
+    uprv_strlcpy_s(plug->name, nameOrError);
   }
 
   if(config!=NULL) {
-    uprv_strlcpy(plug->config, config, UPLUG_NAME_MAX);
+    uprv_strlcpy_s(plug->config, config);
   }
 
   return plug;
@@ -771,19 +772,19 @@ uplug_init(UErrorCode *status) {
     if(U_FAILURE(*status)) {
       return;
     }
-    if((size_t)pluginFile.length() > (sizeof(plugin_file)-1)) {
+
+    /* plugin_file is not used for processing - it is only used 
+       so that uplug_getPluginFile() works (i.e. icuinfo)
+    */
+    if (uprv_strlcpy_s(plugin_file, pluginFile.data()) > (sizeof(plugin_file) - 1))
+    {
       *status = U_BUFFER_OVERFLOW_ERROR;
 #if UPLUG_TRACE
       DBG((stderr, "status=%s\n", u_errorName(*status)));
 #endif
       return;
     }
-    
-    /* plugin_file is not used for processing - it is only used 
-       so that uplug_getPluginFile() works (i.e. icuinfo)
-    */
-    uprv_strlcpy(plugin_file, pluginFile.data(), sizeof(plugin_file));
-        
+
 #if UPLUG_TRACE
     DBG((stderr, "pluginfile= %s len %d/%d\n", plugin_file, (int)strlen(plugin_file), (int)sizeof(plugin_file)));
 #endif

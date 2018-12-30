@@ -42,6 +42,7 @@
 #include "ucnv_cnv.h"
 #include "ucnvmbcs.h"
 #include "cstring.h"
+#include "cpputils.h"
 #include "cmemory.h"
 #include "uassert.h"
 
@@ -493,7 +494,7 @@ _ISO2022Open(UConverter *cnv, UConverterLoadArgs *pArgs, UErrorCode *errorCode){
         myConverterData->currentType = ASCII1;
         cnv->fromUnicodeStatus =FALSE;
         if(pArgs->locale){
-            uprv_strlcpy(myLocale, pArgs->locale, sizeof(myLocale));
+            uprv_strlcpy_s(myLocale, pArgs->locale);
         }
         version = pArgs->options & UCNV_OPTIONS_VERSION_MASK;
         myConverterData->version = version;

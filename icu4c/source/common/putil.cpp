@@ -2008,13 +2008,9 @@ getCodepageFromPOSIXID(const char *localeName, char * buffer, int32_t buffCapaci
     char *variant = NULL;
 
     if (localeName != NULL && (name = (uprv_strchr(localeName, '.'))) != NULL) {
-        size_t localeCapacity = uprv_min(sizeof(localeBuf), (name-localeName)+1);
-        uprv_strlcpy(localeBuf, localeName, localeCapacity);
-        //localeBuf[localeCapacity-1] = 0; /* ensure NULL termination */
-        //name = uprv_strncpy(buffer, name+1, buffCapacity);
+        uprv_strlcpy(localeBuf, localeName, uprv_min(sizeof(localeBuf), (name-localeName)+1));
         uprv_strlcpy(buffer, name+1, buffCapacity);
         name = buffer;
-        //buffer[buffCapacity-1] = 0; /* ensure NULL termination */
         if ((variant = const_cast<char *>(uprv_strchr(name, '@'))) != NULL) {
             *variant = 0;
         }
@@ -2118,8 +2114,7 @@ int_getDefaultCodepage()
         }
 
         if (codeset != NULL) {
-            uprv_strlcpy(codesetName, codeset, sizeof(codesetName));
-            //codesetName[sizeof(codesetName)-1] = 0;
+            uprv_strlcpy_s(codesetName, codeset);
             return codesetName;
         }
     }

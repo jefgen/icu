@@ -150,8 +150,7 @@ findDirname(const char *path, char *buffer, int32_t bufLen, UErrorCode* status) 
   }
 
   if((resultLen+1) <= bufLen) {
-    uprv_strlcpy(buffer, resultPtr, resultLen+1);
-    //buffer[resultLen]=0;
+    uprv_strlcpy(buffer, resultPtr, resultLen + 1);
     return buffer;
   } else {
     *status = U_BUFFER_OVERFLOW_ERROR;

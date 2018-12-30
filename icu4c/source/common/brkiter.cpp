@@ -39,6 +39,7 @@
 #include "uassert.h"
 #include "ubrkimpl.h"
 #include "charstr.h"
+#include "cpputils.h"
 
 // *****************************************************************************
 // class BreakIterator
@@ -204,14 +205,14 @@ BreakIterator::BreakIterator()
 }
 
 BreakIterator::BreakIterator(const BreakIterator &other) : UObject(other) {
-    uprv_strlcpy(actualLocale, other.actualLocale, sizeof(actualLocale));
-    uprv_strlcpy(validLocale, other.validLocale, sizeof(validLocale));
+    uprv_strlcpy_s(actualLocale, other.actualLocale);
+    uprv_strlcpy_s(validLocale, other.validLocale);
 }
 
 BreakIterator &BreakIterator::operator =(const BreakIterator &other) {
     if (this != &other) {
-        uprv_strlcpy(actualLocale, other.actualLocale, sizeof(actualLocale));
-        uprv_strlcpy(validLocale, other.validLocale, sizeof(validLocale));
+        uprv_strlcpy_s(actualLocale, other.actualLocale);
+        uprv_strlcpy_s(validLocale, other.validLocale);
     }
     return *this;
 }

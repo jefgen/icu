@@ -1048,7 +1048,6 @@ bundle_write_xml(struct SRBRoot *bundle, const char *outputDir,const char* outpu
     }
     index = (int32_t)(uprv_strlen(filename) - uprv_strlen(textExt) - first);
     originalFileName = (char *)uprv_malloc(sizeof(char)*index+1);
-    //uprv_memset(originalFileName, 0, sizeof(char)*index+1);
     uprv_strlcpy(originalFileName, filename + first, index+1);
 
     if(uprv_strcmp(originalFileName, srBundle->fLocale) != 0) {

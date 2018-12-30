@@ -110,4 +110,6 @@ size_t uprv_strlcpy_s(char (&dest)[count], const char *src)
     return uprv_strlcpy(dest, src, count);
 }
 
+// TODO:jefgen: add a UChar version?
+
 #endif /* _CPPUTILS */

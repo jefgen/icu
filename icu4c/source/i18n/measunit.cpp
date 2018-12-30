@@ -20,6 +20,7 @@
 #include "ustrenum.h"
 #include "cstring.h"
 #include "uassert.h"
+#include "cpputils.h"
 
 U_NAMESPACE_BEGIN
 
@@ -1926,8 +1927,7 @@ void MeasureUnit::initCurrency(const char *isoCurrency) {
     if (result != -1) {
         fSubTypeId = result - gOffsets[fTypeId];
     } else {
-        uprv_strlcpy(fCurrency, isoCurrency, UPRV_LENGTHOF(fCurrency));
-        //fCurrency[3] = 0;
+        uprv_strlcpy_s(fCurrency, isoCurrency);
     }
 }
 

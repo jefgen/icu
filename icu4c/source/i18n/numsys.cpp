@@ -28,6 +28,7 @@
 #include "uassert.h"
 #include "uresimp.h"
 #include "numsys_impl.h"
+#include "cpputils.h"
 
 #if !UCONFIG_NO_FORMATTING
 
@@ -258,8 +259,7 @@ void NumberingSystem::setName(const char *n) {
     if ( n == nullptr ) {
         name[0] = (char) 0;
     } else {
-        uprv_strlcpy(name,n,NUMSYS_NAME_CAPACITY+1);
-        //name[NUMSYS_NAME_CAPACITY] = '\0'; // Make sure it is null terminated.
+        uprv_strlcpy_s(name, n);
     }
 }
 UBool NumberingSystem::isAlgorithmic() const {

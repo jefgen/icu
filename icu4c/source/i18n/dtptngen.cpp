@@ -1419,8 +1419,7 @@ DateTimePatternGenerator::getAppendFormatNumber(const char* field) const {
 UDateTimePatternField
 DateTimePatternGenerator::getFieldAndWidthIndices(const char* key, UDateTimePGDisplayWidth* widthP) const {
     char cldrFieldKey[UDATPG_FIELD_KEY_MAX + 1];
-    uprv_strlcpy(cldrFieldKey, key, UDATPG_FIELD_KEY_MAX + 1);
-    //cldrFieldKey[UDATPG_FIELD_KEY_MAX]=0; // ensure termination
+    uprv_strlcpy_s(cldrFieldKey, key);
     *widthP = UDATPG_WIDE;
     char* hyphenPtr = uprv_strchr(cldrFieldKey, '-');
     if (hyphenPtr) {

@@ -45,6 +45,7 @@
 #include "uenumimp.h"
 #include "uassert.h"
 #include "charstr.h"
+#include "cpputils.h"
 
 #include <stdio.h> /* for sprintf */
 
@@ -2146,8 +2147,7 @@ _uloc_strtod(const char *start, char **end) {
     if(gDecimal == '.') {
         return uprv_strtod(start, end); /* fall through to OS */
     } else {
-        uprv_strlcpy(buf, start, 30);
-        //buf[29]=0;
+        uprv_strlcpy_s(buf, start);
         decimal = uprv_strchr(buf, '.');
         if(decimal) {
             *decimal = gDecimal;

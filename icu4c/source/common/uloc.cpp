@@ -2260,14 +2260,14 @@ uloc_acceptLanguageFromHTTP(char *result, int32_t resultAvailable, UAcceptResult
           *status = U_BUFFER_OVERFLOW_ERROR;
           return -1; // too big
         }
-        uprv_strlcpy(items[n].locale, s, slen+1);
-        //items[n].locale[slen]=0; // terminate
+        uprv_strncpy(items[n].locale, s, slen);
+        items[n].locale[slen]=0; // terminate
         int32_t clen = uloc_canonicalize(items[n].locale, tmp, UPRV_LENGTHOF(tmp)-1, status);
         if(U_FAILURE(*status)) return -1;
         if((clen!=slen) || (uprv_strncmp(items[n].locale, tmp, slen))) {
             // canonicalization had an effect- copy back
-            uprv_strlcpy(items[n].locale, tmp, clen+1);
-            //items[n].locale[clen] = 0; // terminate
+            uprv_strncpy(items[n].locale, tmp, clen);
+            items[n].locale[clen] = 0; // terminate
         }
 #if defined(ULOC_DEBUG)
         /*fprintf(stderr,"%d: s <%s> q <%g>\n", n, j[n].locale, j[n].q);*/

@@ -32,6 +32,8 @@
 #include "uresimp.h"
 #include "resource.h"
 #include "formattedval_impl.h"
+#include "cpputils.h"
+
 
 U_NAMESPACE_BEGIN
 
@@ -259,8 +261,7 @@ ListFormatInternal* ListFormatter::loadListFormatInternal(
     }
     ListFormatter::ListPatternsSink sink;
     char currentStyle[kStyleLenMax+1];
-    uprv_strlcpy(currentStyle, style, kStyleLenMax+1);
-    //currentStyle[kStyleLenMax] = 0;
+    uprv_strlcpy_s(currentStyle, style);
 
     for (;;) {
         ures_getAllItemsWithFallback(rb, currentStyle, sink, errorCode);

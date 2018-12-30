@@ -2493,7 +2493,6 @@ CalFields::toString(char* buf, int32_t len) const {
     char local[32];
     sprintf(local, "%04d-%02d-%02d %02d:%02d:%02d.%03d", year, month, day, hour, min, sec, ms);
     uprv_strlcpy(buf, local, len);
-    //buf[len - 1] = 0;
     return buf;
 }
 

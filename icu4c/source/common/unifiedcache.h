@@ -116,7 +116,6 @@ class CacheKey : public CacheKeyBase {
    virtual char *writeDescription(char *buffer, int32_t bufLen) const {
        const char *s = typeid(T).name();
        uprv_strlcpy(buffer, s, bufLen);
-       //buffer[bufLen - 1] = 0;
        return buffer;
    }
 

@@ -38,6 +38,7 @@
 #include "umutex.h"
 #include "putilimp.h"
 #include "uassert.h"
+#include "cpputils.h"
 
 using namespace icu;
 
@@ -648,8 +649,7 @@ static UResourceDataEntry *entryOpen(const char* path, const char* localeID,
         return NULL;
     }
 
-    uprv_strlcpy(name, localeID, sizeof(name));
-    //name[sizeof(name) - 1] = 0;
+    uprv_strlcpy_s(name, localeID);
 
     if ( usingUSRData ) {
         if ( path == NULL ) {

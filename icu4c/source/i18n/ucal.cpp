@@ -139,12 +139,15 @@ ucal_open(  const UChar*  zoneID,
             UCalendarType caltype,
             UErrorCode*   status)
 {
-
   if(U_FAILURE(*status)) return 0;
-  
-  TimeZone* zone = (zoneID==NULL) ? TimeZone::createDefault()
-      : _createTimeZone(zoneID, len, status);
 
+  LocalPointer<TimeZone> zone;
+  if (zoneID == NULL) {
+      zone.adoptInsteadAndCheckErrorCode(TimeZone::createDefault(), *status);
+  } else {
+      zone.adoptInstead(_createTimeZone(zoneID, len, status));
+  }
+  
   if (U_FAILURE(*status)) {
       return NULL;
   }
@@ -154,15 +157,18 @@ ucal_open(  const UChar*  zoneID,
       if ( locale == NULL ) {
           locale = uloc_getDefault();
       }
-      // TODO:jefgen: return error on trunc?
-      uprv_strlcpy(localeBuf, locale, ULOC_LOCALE_IDENTIFIER_CAPACITY);
+      if (uprv_strlcpy_s(localeBuf, locale) >= sizeof(localeBuf)) {
+          // could also return U_ILLEGAL_ARGUMENT_ERROR perhaps.
+          *status = U_BUFFER_OVERFLOW_ERROR;
+          return NULL;
+      }
       uloc_setKeywordValue("calendar", "gregorian", localeBuf, ULOC_LOCALE_IDENTIFIER_CAPACITY, status);
       if (U_FAILURE(*status)) {
           return NULL;
       }
-      return (UCalendar*)Calendar::createInstance(zone, Locale(localeBuf), *status);
+      return (UCalendar*)Calendar::createInstance(zone.orphan(), Locale(localeBuf), *status);
   }
-  return (UCalendar*)Calendar::createInstance(zone, Locale(locale), *status);
+  return (UCalendar*)Calendar::createInstance(zone.orphan(), Locale(locale), *status);
 }
 
 U_CAPI void U_EXPORT2

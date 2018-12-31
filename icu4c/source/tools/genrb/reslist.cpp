@@ -944,7 +944,6 @@ void SRBRoot::write(const char *outputDir, const char *outputPkg,
            len = (int32_t)uprv_strlen(outputDir);
            if (len > writtenFilenameLen) {
                len = writtenFilenameLen;
-               // TODO:jefgen: likely return U_BUFFER_OVERFLOW_ERROR on truncation?
            }
            uprv_strlcpy(writtenFilename, outputDir, len);
        }

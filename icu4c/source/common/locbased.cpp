@@ -37,7 +37,6 @@ const char* LocaleBased::getLocaleID(ULocDataLocaleType type, UErrorCode& status
 }
 
 void LocaleBased::setLocaleIDs(const char* validID, const char* actualID) {
-    // TODO:jefgen: Set an error on truncation?
     if (validID != 0) {
       uprv_strlcpy(valid, validID, ULOC_FULLNAME_CAPACITY);
     }

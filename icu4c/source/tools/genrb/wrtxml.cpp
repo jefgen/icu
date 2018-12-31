@@ -1124,7 +1124,6 @@ bundle_write_xml(struct SRBRoot *bundle, const char *outputDir,const char* outpu
     uprv_strcat(xmlfileName,xliffExt);
 
     if (writtenFilename) {
-        // TODO:jefgen: return error on trunc?
         uprv_strlcpy(writtenFilename, xmlfileName, writtenFilenameLen);
     }
 

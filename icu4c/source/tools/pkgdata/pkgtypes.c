@@ -34,7 +34,6 @@ const char *pkg_writeCharListWrap(FileStream *s, CharList *l, const char *delim,
     {
         if(l->str)
         {
-            // TODO:jefgen: what are the extra 4 chars used for...?
             uprv_strlcpy(buffer, l->str, 1020);
 
             if(quote < 0) { /* remove quotes */
@@ -47,7 +46,7 @@ const char *pkg_writeCharListWrap(FileStream *s, CharList *l, const char *delim,
             } else if(quote > 0) { /* add quotes */
                 if(l->str[0] != '"') {
                     uprv_strcpy(buffer, "\"");
-                    uprv_strncat(buffer, l->str,1020);
+                    uprv_strncat(buffer, l->str, 1020);
                 }
                 if(l->str[uprv_strlen(l->str)-1] != '"') {
                     uprv_strcat(buffer, "\"");

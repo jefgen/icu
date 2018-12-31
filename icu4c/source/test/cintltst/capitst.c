@@ -569,7 +569,7 @@ void TestCompare()
     status=U_ZERO_ERROR;
     col = ucol_open("en_US", &status);
     if(U_FAILURE(status)) {
-        log_err_status(status, "ucal_open() collation creation failed.: %s\n", myErrorName(status));
+        log_err_status(status, "ucol_open() collation creation failed.: %s\n", myErrorName(status));
         return;
     }
     test1=(UChar*)malloc(sizeof(UChar) * 6);

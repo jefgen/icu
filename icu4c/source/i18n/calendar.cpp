@@ -516,9 +516,12 @@ public:
     virtual ~CalendarService();
 
     virtual UObject* cloneInstance(UObject* instance) const {
-        UnicodeString *s = dynamic_cast<UnicodeString *>(instance);
-        if(s != NULL) {
+        if (typeid(*instance) == typeid(UnicodeString)) {
+            UnicodeString *s = static_cast<UnicodeString *>(instance);
             return s->clone();
+        //UnicodeString *s = dynamic_cast<UnicodeString *>(instance);
+        //if(s != NULL) {
+        //    return s->clone();
         } else {
 #ifdef U_DEBUG_CALSVC_F
             UErrorCode status2 = U_ZERO_ERROR;
@@ -902,8 +905,10 @@ Calendar::makeInstance(const Locale& aLocale, UErrorCode& success) {
     }
 
 #if !UCONFIG_NO_SERVICE
-    const UnicodeString* str = dynamic_cast<const UnicodeString*>(u);
-    if(str != NULL) {
+    if (typeid(*u) == typeid(UnicodeString)) {
+        const UnicodeString* str = static_cast<UnicodeString *>(u);
+    //const UnicodeString* str = dynamic_cast<const UnicodeString*>(u);
+    //if(str != NULL) {
         // It's a unicode string telling us what type of calendar to load ("gregorian", etc)
         // Create a Locale over this string
         Locale l("");
@@ -929,6 +934,8 @@ Calendar::makeInstance(const Locale& aLocale, UErrorCode& success) {
             return NULL;
         }
 
+        //if (typeid(*c) == typeid(UnicodeString)) {
+        //    const UnicodeString* str = static_cast<UnicodeString *>(c);
         str = dynamic_cast<const UnicodeString*>(c);
         if(str != NULL) {
             // recursed! Second lookup returned a UnicodeString.

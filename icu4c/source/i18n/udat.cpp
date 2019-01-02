@@ -38,7 +38,8 @@ U_NAMESPACE_USE
  */
 static void verifyIsSimpleDateFormat(const UDateFormat* fmt, UErrorCode *status) {
    if(U_SUCCESS(*status) &&
-       dynamic_cast<const SimpleDateFormat*>(reinterpret_cast<const DateFormat*>(fmt))==NULL) {
+       (typeid(*reinterpret_cast<const DateFormat *>(fmt)) != typeid(const SimpleDateFormat))) {
+       //dynamic_cast<const SimpleDateFormat*>(reinterpret_cast<const DateFormat*>(fmt))==NULL) {
        *status = U_ILLEGAL_ARGUMENT_ERROR;
    }
 }
@@ -596,13 +597,25 @@ udat_getSymbols(const   UDateFormat     *fmt,
     const DateFormatSymbols *syms;
     const SimpleDateFormat* sdtfmt;
     const RelativeDateFormat* rdtfmt;
+    
+    auto* dfmt = reinterpret_cast<const DateFormat*>(fmt);
+    if (typeid(*dfmt) == typeid(const SimpleDateFormat)) {
+        sdtfmt = static_cast<const SimpleDateFormat *>(dfmt);
+        syms = sdtfmt->getDateFormatSymbols();
+    } else if (typeid(*dfmt) == typeid(const RelativeDateFormat)) {
+        rdtfmt = static_cast<const RelativeDateFormat *>(dfmt);
+        syms = rdtfmt->getDateFormatSymbols();
+    } else {
+        return -1; // TODO:jefgen: shouldn't this set U_ILLEGAL_ARGUMENT_ERROR ?
+    }
+    /*
     if ((sdtfmt = dynamic_cast<const SimpleDateFormat*>(reinterpret_cast<const DateFormat*>(fmt))) != NULL) {
         syms = sdtfmt->getDateFormatSymbols();
     } else if ((rdtfmt = dynamic_cast<const RelativeDateFormat*>(reinterpret_cast<const DateFormat*>(fmt))) != NULL) {
         syms = rdtfmt->getDateFormatSymbols();
     } else {
         return -1;
-    }
+    }*/
     int32_t count = 0;
     const UnicodeString *res = NULL;
 

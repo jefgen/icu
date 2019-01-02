@@ -508,10 +508,11 @@ Format* DecimalFormat::clone() const {
 }
 
 UBool DecimalFormat::operator==(const Format& other) const {
-    auto* otherDF = dynamic_cast<const DecimalFormat*>(&other);
-    if (otherDF == nullptr) {
+	if (typeid(other) != typeid(DecimalFormat)) {
         return false;
     }
+    auto *otherDF = static_cast<const DecimalFormat *>(&other);
+
     // If either object is in an invalid state, prevent dereferencing nullptr below.
     // Additionally, invalid objects should not be considered equal to anything.
     if (fields == nullptr || otherDF->fields == nullptr) {

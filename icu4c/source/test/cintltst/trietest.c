@@ -269,7 +269,7 @@ testTrieRangesWithMalloc(const char *testName,
     UBool overwrite, ok;
     uint8_t* storage =NULL;
     static const int32_t DEFAULT_STORAGE_SIZE = 32768;
-    storage = (uint8_t*) uprv_malloc(sizeof(uint8_t)*DEFAULT_STORAGE_SIZE);
+    storage = (uint8_t*) malloc(sizeof(uint8_t)*DEFAULT_STORAGE_SIZE);
 
     log_verbose("\ntesting Trie '%s'\n", testName);
     newTrie=utrie_open(NULL, NULL, 2000,
@@ -439,7 +439,7 @@ testTrieRangesWithMalloc(const char *testName,
     }
 
     testTrieIteration(testName, &trie, checkRanges, countCheckRanges);
-    uprv_free(storage);
+    free(storage);
 }
 
 static void

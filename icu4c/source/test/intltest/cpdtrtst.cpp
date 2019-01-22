@@ -298,16 +298,19 @@ void CompoundTransliteratorTest::TestGetSetAdoptTransliterator(){
     logln("Testing adoptTransliterator() API of CompoundTransliterator");
     UnicodeString ID3("Latin-Katakana");
     Transliterator **transarray2=(Transliterator **)uprv_malloc(sizeof(Transliterator*)*1);
-    transarray2[0] = Transliterator::createInstance(ID3,UTRANS_FORWARD,parseError,status);
-    if (transarray2[0] != 0) {
-        ct1->adoptTransliterators(transarray2, 1);
-    }
-    if(ct1->getCount() != 1 || ct1->getID() != ID3){
-        errln((UnicodeString)"Error: adoptTransliterators() failed.\n\t Count:- expected->1" + (UnicodeString)".  got->" + ct1->getCount() +
-                                                   (UnicodeString)"\n\tID   :- expected->" + ID3 + (UnicodeString)".  got->" + ct1->getID());
-    }
-    else{
-        logln("OK: adoptTranslterator() passed");
+    if (transarray2 != nullptr) {
+        transarray2[0] = Transliterator::createInstance(ID3,UTRANS_FORWARD,parseError,status);
+        if (transarray2[0] != 0) {
+            ct1->adoptTransliterators(transarray2, 1);
+        }
+        if(ct1->getCount() != 1 || ct1->getID() != ID3){
+            errln((UnicodeString)"Error: adoptTransliterators() failed.\n\t Count:- expected->1" + (UnicodeString)".  got->" + ct1->getCount() +
+                                                    (UnicodeString)"\n\tID   :- expected->" + ID3 + (UnicodeString)".  got->" + ct1->getID());
+        } else {
+            logln("OK: adoptTranslterator() passed");
+        }
+    } else {
+        logln("Failed to allocate transarray2, skipping adoptTranslterator() test.");
     }
     delete ct1;
     for(i=0;i<count;i++){

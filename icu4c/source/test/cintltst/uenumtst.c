@@ -231,7 +231,12 @@ static void EnumerationTest(void) {
 
 static void EmptyEnumerationTest(void) {
     UErrorCode status = U_ZERO_ERROR;
+    // uenum_close() calls uprv_free, se we must use uprv_malloc.
     UEnumeration *emptyEnum = uprv_malloc(sizeof(UEnumeration));
+    if (emptyEnum == NULL) {
+        log_verbose("failed to allocate emptyEnum, skipping test\n");
+        return;
+    }
 
     uprv_memcpy(emptyEnum, &emptyEnumerator, sizeof(UEnumeration));
     if (uenum_count(emptyEnum, &status) != -1 || status != U_UNSUPPORTED_ERROR) {
@@ -250,7 +255,7 @@ static void EmptyEnumerationTest(void) {
     if (status != U_UNSUPPORTED_ERROR) {
         log_err("uenum_reset failed\n");
     }
-    uenum_close(emptyEnum);
+    uenum_close(emptyEnum); // frees emptyEnum
 
     status = U_ZERO_ERROR;
     if (uenum_next(NULL, NULL, &status) != NULL || status != U_ZERO_ERROR) {
@@ -267,6 +272,10 @@ static void EmptyEnumerationTest(void) {
     }
 
     emptyEnum = uprv_malloc(sizeof(UEnumeration));
+    if (emptyEnum == NULL) {
+        log_verbose("failed to allocate emptyEnum, skipping test\n");
+        return;
+    }
     uprv_memcpy(emptyEnum, &emptyPartialEnumerator, sizeof(UEnumeration));
     status = U_ZERO_ERROR;
     if (uenum_unext(emptyEnum, NULL, &status) != NULL || status != U_UNSUPPORTED_ERROR) {

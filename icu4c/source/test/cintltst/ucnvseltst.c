@@ -55,7 +55,7 @@ getAvailableNames() {
     log_data_err("No converters available.\n");
     return FALSE;
   }
-  gAvailableNames = (const char **)uprv_malloc(gCountAvailable * sizeof(const char *));
+  gAvailableNames = (const char **)malloc(gCountAvailable * sizeof(const char *));
   if (gAvailableNames == NULL) {
     log_err("unable to allocate memory for %ld available converter names\n",
             (long)gCountAvailable);
@@ -69,7 +69,7 @@ getAvailableNames() {
 
 static void
 releaseAvailableNames() {
-  uprv_free((void *)gAvailableNames);
+  free((void *)gAvailableNames);
   gAvailableNames = NULL;
   gCountAvailable = 0;
 }
@@ -83,7 +83,7 @@ getEncodings(int32_t start, int32_t step, int32_t count, int32_t *pCount) {
   if (count <= 0) {
     return NULL;
   }
-  names = (const char **)uprv_malloc(count * sizeof(char *));
+  names = (const char **)malloc(count * sizeof(char *));
   if (names == NULL) {
     log_err("memory allocation error for %ld pointers\n", (long)count);
     return NULL;
@@ -235,7 +235,7 @@ text_open(TestText *tt) {
   fseek(f, 0, SEEK_END);
   length = (int32_t)ftell(f);
   fseek(f, 0, SEEK_SET);
-  tt->text = (char *)uprv_malloc(length + 1);
+  tt->text = (char *)malloc(length + 1);
   if (tt->text == NULL) {
     fclose(f);
     return FALSE;
@@ -243,7 +243,7 @@ text_open(TestText *tt) {
   if (length != (int32_t)fread(tt->text, 1, length, f)) {
     log_err("error reading %ld bytes from test text file\n", (long)length);
     length = 0;
-    uprv_free(tt->text);
+    free(tt->text);
   }
   fclose(f);
   tt->textLimit = tt->text + length;
@@ -256,7 +256,7 @@ text_open(TestText *tt) {
 
 static void
 text_close(TestText *tt) {
-  uprv_free(tt->text);
+  free(tt->text);
 }
 
 static int32_t findIndex(const char* converterName) {
@@ -276,7 +276,7 @@ getResultsManually(const char** encodings, int32_t num_encodings,
   UBool* resultsManually;
   int32_t i;
 
-  resultsManually = (UBool*) uprv_malloc(gCountAvailable);
+  resultsManually = (UBool*) malloc(gCountAvailable);
   uprv_memset(resultsManually, 0, gCountAvailable);
 
   for(i = 0 ; i < num_encodings ; i++) {
@@ -326,7 +326,7 @@ getResultsManually(const char** encodings, int32_t num_encodings,
 
 /* closes res but does not free resultsManually */
 static void verifyResult(UEnumeration* res, const UBool *resultsManually) {
-  UBool* resultsFromSystem = (UBool*) uprv_malloc(gCountAvailable * sizeof(UBool));
+  UBool* resultsFromSystem = (UBool*) malloc(gCountAvailable * sizeof(UBool));
   const char* name;
   UErrorCode status = U_ZERO_ERROR;
   int32_t i;
@@ -343,7 +343,7 @@ static void verifyResult(UEnumeration* res, const UBool *resultsManually) {
               gAvailableNames[i], resultsManually[i], resultsFromSystem[i]);
     }
   }
-  uprv_free(resultsFromSystem);
+  free(resultsFromSystem);
   uenum_close(res);
 }
 
@@ -357,16 +357,16 @@ serializeAndUnserialize(UConverterSelector *sel, char **buffer, UErrorCode *stat
     log_err("ucnvsel_serialize(preflighting) failed: %s\n", u_errorName(*status));
     return sel;
   }
-  new_buffer = (char *)uprv_malloc(ser_len);
+  new_buffer = (char *)malloc(ser_len);
   *status = U_ZERO_ERROR;
   ser_len2 = ucnvsel_serialize(sel, new_buffer, ser_len, status);
   if (U_FAILURE(*status) || ser_len != ser_len2) {
     log_err("ucnvsel_serialize() failed: %s\n", u_errorName(*status));
-    uprv_free(new_buffer);
+    free(new_buffer);
     return sel;
   }
   ucnvsel_close(sel);
-  uprv_free(*buffer);
+  free(*buffer);
   *buffer = new_buffer;
   sel = ucnvsel_openFromSerialized(new_buffer, ser_len, status);
   if (U_FAILURE(*status)) {
@@ -400,7 +400,7 @@ static void TestSelector()
     int32_t num_encodings;
     const char **encodings = getEncodingsFns[testCaseIdx](&num_encodings);
     if (getTestOption(QUICK_OPTION) && num_encodings > 25) {
-      uprv_free((void *)encodings);
+      free((void *)encodings);
       continue;
     }
 
@@ -438,7 +438,7 @@ static void TestSelector()
       if (U_FAILURE(status)) {
         log_err("ucnv_sel_open(encodings %ld) failed - %s\n", testCaseIdx, u_errorName(status));
         ucnvsel_close(sel_rt);
-        uprv_free((void *)encodings);
+        free((void *)encodings);
         continue;
       }
 
@@ -488,14 +488,14 @@ static void TestSelector()
           }
         }
 
-        uprv_free(manual_rt);
-        uprv_free(manual_fb);
+        free(manual_rt);
+        free(manual_fb);
       }
       ucnvsel_close(sel_rt);
       ucnvsel_close(sel_fb);
-      uprv_free(buffer_fb);
+      free(buffer_fb);
     }
-    uprv_free((void *)encodings);
+    free((void *)encodings);
   }
 
   releaseAvailableNames();

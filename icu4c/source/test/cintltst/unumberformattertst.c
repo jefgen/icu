@@ -184,7 +184,7 @@ static void TestExampleCode() {
         int32_t len = unumf_resultToString(uresult, NULL, 0, &ec);
         assertTrue("No buffer yet", ec == U_BUFFER_OVERFLOW_ERROR);
         ec = U_ZERO_ERROR;
-        buffer = (UChar*) uprv_malloc((len+1)*sizeof(UChar));
+        buffer = (UChar*) malloc((len+1)*sizeof(UChar));
         unumf_resultToString(uresult, buffer, len+1, &ec);
         assertSuccess("There should not be a failure in the example code", &ec);
         assertUEquals("Should produce expected string result", u"5,142", buffer);
@@ -193,7 +193,7 @@ static void TestExampleCode() {
     // Cleanup:
     unumf_close(uformatter);
     unumf_closeResult(uresult);
-    uprv_free(buffer);
+    free(buffer);
 }
 
 

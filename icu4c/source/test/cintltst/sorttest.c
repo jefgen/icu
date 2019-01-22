@@ -145,8 +145,8 @@ static void StableSortTest(void) {
         return;
     }
 
-    lines=p=(Line *)uprv_malloc(NUM_LINES*sizeof(Line));
-    uprv_memset(lines, 0, NUM_LINES*sizeof(Line));  /* avoid uninitialized memory */
+    lines=p=(Line *)malloc(NUM_LINES*sizeof(Line));
+    memset(lines, 0, NUM_LINES*sizeof(Line));  /* avoid uninitialized memory */
 
     for(j=0; j<STR_LEN; ++j) { s[j]=BASE_CHAR; }
     j=0;
@@ -197,7 +197,7 @@ static void StableSortTest(void) {
         p=q;
     }
 
-    uprv_free(lines);
+    free(lines);
     ucol_close(coll);
 }
 

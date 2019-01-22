@@ -601,7 +601,7 @@ static void TestBreakIteratorRules() {
     if (U_FAILURE(status)) {
         log_err("FAIL: ubrk_getBinaryRules preflight err: %s", u_errorName(status));
     } else {
-        uint8_t* binaryRules = (uint8_t*)uprv_malloc(rulesLength);
+        uint8_t* binaryRules = (uint8_t*)malloc(rulesLength);
         if (binaryRules == NULL) {
             log_err("FAIL: unable to malloc rules buffer, size %u", rulesLength);
         } else {
@@ -627,7 +627,7 @@ static void TestBreakIteratorRules() {
                     ubrk_close(bi2);
                 }
             }
-            uprv_free(binaryRules);
+            free(binaryRules);
         }
     }
 

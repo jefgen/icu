@@ -162,7 +162,7 @@ static void TestUDataOpen(){
        *   If packaging mode == dll, the file may not exist.  So, if the file is 
        *   missing, skip this test without error.
        */
-      icuDataFilePath = (char *)uprv_malloc(strlen(path) + 10);
+      icuDataFilePath = (char *)malloc(strlen(path) + 10);
       strcpy(icuDataFilePath, path);
       strcat(icuDataFilePath, ".dat");
       /* lots_of_mallocs(); */
@@ -188,7 +188,7 @@ static void TestUDataOpen(){
           log_verbose("Skipping tests of udata_open() on %s.  File not present in this configuration.\n",
                   icuDataFilePath);
       }
-      uprv_free(icuDataFilePath);
+      free(icuDataFilePath);
     }
     /* try again, adding /tmp */
     {

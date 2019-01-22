@@ -5569,7 +5569,7 @@ static void TestImport(void)
     }
     escoll = ucol_open("es", &status);
     esrules = (UChar*) ucol_getRules(escoll, &esruleslength);
-    viesrules = (UChar*)uprv_malloc((viruleslength+esruleslength+1)*sizeof(UChar*));
+    viesrules = (UChar*)malloc((viruleslength+esruleslength+1)*sizeof(UChar*));
     viesrules[0] = 0;
     u_strcat(viesrules, virules);
     u_strcat(viesrules, esrules);
@@ -5622,7 +5622,7 @@ static void TestImport(void)
 
     uset_close(tailoredSet);
 
-    uprv_free(viesrules);
+    free(viesrules);
 
     ucol_close(vicoll);
     ucol_close(escoll);
@@ -5680,7 +5680,7 @@ static void TestImportWithType(void)
 
 
     derules = ucol_getRules(decoll, &deruleslength);
-    viderules = (UChar*)uprv_malloc((viruleslength+deruleslength+1)*sizeof(UChar*));
+    viderules = (UChar*)malloc((viruleslength+deruleslength+1)*sizeof(UChar*));
     viderules[0] = 0;
     u_strcat(viderules, virules);
     u_strcat(viderules, derules);
@@ -5732,7 +5732,7 @@ static void TestImportWithType(void)
 
     uset_close(tailoredSet);
 
-    uprv_free(viderules);
+    free(viderules);
 
     ucol_close(videcoll);
     ucol_close(importvidecoll);

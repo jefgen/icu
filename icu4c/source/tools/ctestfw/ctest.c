@@ -128,6 +128,8 @@ int WARN_ON_MISSING_DATA = 0; /* Reduce data errs to warnings? */
 UTraceLevel ICU_TRACE = UTRACE_OFF;  /* ICU tracing level */
 size_t MINIMUM_MEMORY_SIZE_FAILURE = (size_t)-1; /* Minimum library memory allocation window that will fail. */
 size_t MAXIMUM_MEMORY_SIZE_FAILURE = (size_t)-1; /* Maximum library memory allocation window that will fail. */
+int RAND_OOM_FAILURE_PERCENTAGE = 0; /* Percentage chance that a memory [re]allocation will fail. For OOM testing. */
+unsigned int RAND_OOM_FAILURE_SEED = 0; /* Optional seed value for random number generator. For OOM testing. */
 static const char *ARGV_0 = "[ALL]";
 static const char *XML_FILE_NAME=NULL;
 static char XML_PREFIX[256];
@@ -953,6 +955,35 @@ static void U_CALLCONV ctest_libFree(const void *context, void *mem) {
     free(mem);
 }
 
+// For random memory allocation failure testing
+static void *U_CALLCONV ctest_rand_libMalloc(const void *context, size_t size) {
+    int r = rand() % 100;
+    if (r < RAND_OOM_FAILURE_PERCENTAGE) {
+        if (VERBOSITY) {
+            printf("OOM: failing to allocate %ld\n", (long)size);
+        }
+        return NULL;
+    }
+    if (VERBOSITY) {
+        printf("OOM: allocating %ld\n", (long)size);
+    }
+    return malloc(size);
+}
+static void *U_CALLCONV ctest_rand_libRealloc(const void *context, void *mem, size_t size) {
+    int r = rand() % 100;
+    if (r < RAND_OOM_FAILURE_PERCENTAGE) {
+        if (VERBOSITY) {
+            printf("OOM: failing to reallocate %ld\n", (long)size);
+        }
+        return NULL;
+    }
+    if (VERBOSITY) {
+        printf("OOM: reallocating %ld\n", (long)size);
+    }
+    return realloc(mem, size);
+}
+
+
 int T_CTEST_EXPORT2
 initArgs( int argc, const char* const argv[], ArgHandlerPtr argHandler, void *context)
 {
@@ -1029,6 +1060,50 @@ initArgs( int argc, const char* const argv[], ArgHandlerPtr argHandler, void *co
             }
             /* Use the default value */
             u_setMemoryFunctions(NULL, ctest_libMalloc, ctest_libRealloc, ctest_libFree, &errorCode);
+            if (U_FAILURE(errorCode)) {
+                printf("u_setMemoryFunctions returned %s\n", u_errorName(errorCode));
+                return 0;
+            }
+        }
+        else if (strcmp( argv[i], "-M") ==0)
+        {
+            UErrorCode errorCode = U_ZERO_ERROR;
+            if (i+1 < argc) {
+                char *endPtr = NULL;
+                i++;
+                RAND_OOM_FAILURE_PERCENTAGE = (int)strtol(argv[i], &endPtr, 10);
+                if (endPtr == argv[i]) {
+                    printf("Can't parse %s\n", argv[i]);
+                    help(argv[0]);
+                    return 0;
+                }
+                // check for out of range.
+                if (RAND_OOM_FAILURE_PERCENTAGE > 100 || RAND_OOM_FAILURE_PERCENTAGE < 0) {
+                    printf("Invalid OOM failure percentage: %s. Please enter a number between 0-100.\n", argv[i]);
+                    help(argv[0]);
+                    return 0;
+                }
+
+                if (*endPtr == ',') {
+                    char *maxPtr = endPtr+1;
+                    endPtr = NULL;
+                    RAND_OOM_FAILURE_SEED = (unsigned)strtol(maxPtr, &endPtr, 10);
+                    if (endPtr == argv[i]) {
+                        printf("Can't parse %s\n", argv[i]);
+                        help(argv[0]);
+                        return 0;
+                    }
+                }
+            }
+            if (RAND_OOM_FAILURE_SEED == 0) {
+                RAND_OOM_FAILURE_SEED = (unsigned int)uprv_getRawUTCtime();
+            }
+            if (VERBOSITY) {
+                printf("OOM: using random seed of %d\n", RAND_OOM_FAILURE_SEED);
+            }
+            srand(RAND_OOM_FAILURE_SEED);
+
+            u_setMemoryFunctions(NULL, ctest_rand_libMalloc, ctest_rand_libRealloc, ctest_libFree, &errorCode);
             if (U_FAILURE(errorCode)) {
                 printf("u_setMemoryFunctions returned %s\n", u_errorName(errorCode));
                 return 0;
@@ -1201,6 +1276,9 @@ static void help ( const char *argv0 )
     printf("    -no_err_msg (same as -n) \n");
     printf("    -m n[-q] Min-Max memory size that will cause an allocation failure.\n");
     printf("        The default is the maximum value of size_t. Max is optional.\n");
+    printf("    -M p[,s] Simulate random out-of-memory (OOM) failures in library code.\n");
+    printf("        p percentage chance of failure (value between 0-100).\n");
+    printf("        s optional seed value for the random number generator.\n");
     printf("    -r  Repeat tests after calling u_cleanup \n");
     printf("    [/subtest]  To run a subtest \n");
     printf("    eg: to run just the utility tests type: cintltest /tsutil) \n");

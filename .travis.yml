@@ -93,8 +93,3 @@ matrix:
             make -j2  &&
             make -j2 -C test &&
             make -j2 -C test/intltest check
-
-    # copyright scan / future linter
-    - name: "lint"
-      script:
-          - perl tools/scripts/cpysearch/cpyscan.pl

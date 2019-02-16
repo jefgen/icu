@@ -22,11 +22,13 @@ U_NAMESPACE_BEGIN
 CurrencyAmount::CurrencyAmount(const Formattable& amount, ConstChar16Ptr isoCode,
                                UErrorCode& ec) :
     Measure(amount, new CurrencyUnit(isoCode, ec), ec) {
+    // TODO: OOM.
 }
 
 CurrencyAmount::CurrencyAmount(double amount, ConstChar16Ptr isoCode,
                                UErrorCode& ec) :
     Measure(Formattable(amount), new CurrencyUnit(isoCode, ec), ec) {
+    // TODO: OOM.
 }
 
 CurrencyAmount::CurrencyAmount(const CurrencyAmount& other) :

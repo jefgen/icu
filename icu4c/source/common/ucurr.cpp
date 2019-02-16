@@ -916,6 +916,7 @@ toUpperCase(const UChar* source, int32_t len, const char* locale) {
 
     ec = U_ZERO_ERROR;
     dest = (UChar*)uprv_malloc(sizeof(UChar) * MAX(destLen, len));
+    // TODO: OOM.
     u_strToUpper(dest, destLen, source, len, locale, &ec);
     if (U_FAILURE(ec)) {
         u_memcpy(dest, source, len);
@@ -1027,6 +1028,7 @@ collectCurrencyNames(const char* locale,
             // Add currency ISO code.
             (*currencySymbols)[*total_currency_symbol_count].IsoCode = iso;
             (*currencySymbols)[*total_currency_symbol_count].currencyName = (UChar*)uprv_malloc(sizeof(UChar)*3);
+            // TODO: OOM.
             // Must convert iso[] into Unicode
             u_charsToUChars(iso, (*currencySymbols)[*total_currency_symbol_count].currencyName, 3);
             (*currencySymbols)[*total_currency_symbol_count].flag = NEED_TO_BE_DELETED;
@@ -1453,6 +1455,7 @@ getCacheEntry(const char* locale, UErrorCode& ec) {
                 }
             }
             cacheEntry = (CurrencyNameCacheEntry*)uprv_malloc(sizeof(CurrencyNameCacheEntry));
+            // TODO: OOM.
             currCache[currentCacheEntryIndex] = cacheEntry;
             uprv_strcpy(cacheEntry->locale, locale);
             cacheEntry->currencyNames = currencyNames;
@@ -2231,25 +2234,27 @@ static const icu::Hashtable* getCurrSymbolsEquiv() {
 
 U_CAPI UEnumeration * U_EXPORT2
 ucurr_openISOCurrencies(uint32_t currType, UErrorCode *pErrorCode) {
-    UEnumeration *myEnum = NULL;
+    if (U_FAILURE(*pErrorCode)) {
+        return NULL;
+    }
+    //UEnumeration *myEnum = NULL;
     UCurrencyContext *myContext;
+    LocalMemory<UEnumeration> myEnum((UEnumeration*)uprv_malloc(sizeof(UEnumeration)));
 
-    myEnum = (UEnumeration*)uprv_malloc(sizeof(UEnumeration));
-    if (myEnum == NULL) {
+    if (myEnum.isNull()) {
         *pErrorCode = U_MEMORY_ALLOCATION_ERROR;
         return NULL;
     }
-    uprv_memcpy(myEnum, &gEnumCurrencyList, sizeof(UEnumeration));
+    uprv_memcpy(myEnum.getAlias(), &gEnumCurrencyList, sizeof(UEnumeration));
     myContext = (UCurrencyContext*)uprv_malloc(sizeof(UCurrencyContext));
     if (myContext == NULL) {
         *pErrorCode = U_MEMORY_ALLOCATION_ERROR;
-        uprv_free(myEnum);
         return NULL;
     }
     myContext->currType = currType;
     myContext->listIdx = 0;
     myEnum->context = myContext;
-    return myEnum;
+    return myEnum.orphan();
 }
 
 U_CAPI int32_t U_EXPORT2
@@ -2526,6 +2531,9 @@ static const UEnumeration defaultKeywordValues = {
 };
 
 U_CAPI UEnumeration *U_EXPORT2 ucurr_getKeywordValuesForLocale(const char *key, const char *locale, UBool commonlyUsed, UErrorCode* status) {
+    if (U_FAILURE(*status)) {
+        return NULL;
+    }
     // Resolve region
     char prefRegion[ULOC_COUNTRY_CAPACITY];
     ulocimp_getRegionForSupplementalData(locale, TRUE, prefRegion, sizeof(prefRegion), status);
@@ -2638,6 +2646,10 @@ U_CAPI UEnumeration *U_EXPORT2 ucurr_getKeywordValuesForLocale(const char *key, 
             while ((value = (char *)ulist_getNext(otherValues)) != NULL) {
                 if (!ulist_containsString(values, value, (int32_t)uprv_strlen(value))) {
                     char *tmpValue = (char *)uprv_malloc(sizeof(char) * ULOC_KEYWORDS_CAPACITY);
+                    if (tmpValue == NULL) {
+                        *status = U_MEMORY_ALLOCATION_ERROR;
+                        break;
+                    }
                     uprv_memcpy(tmpValue, value, uprv_strlen(value) + 1);
                     ulist_addItemEndList(values, tmpValue, TRUE, status);
                     if (U_FAILURE(*status)) {

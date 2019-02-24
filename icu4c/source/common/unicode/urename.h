@@ -1297,6 +1297,7 @@
 #define uprv_asciiFromEbcdic U_ICU_ENTRY_POINT_RENAME(uprv_asciiFromEbcdic)
 #define uprv_asciitolower U_ICU_ENTRY_POINT_RENAME(uprv_asciitolower)
 #define uprv_calloc U_ICU_ENTRY_POINT_RENAME(uprv_calloc)
+#define uprv_printMemoryStats U_ICU_ENTRY_POINT_RENAME(uprv_printMemoryStats)
 #define uprv_ceil U_ICU_ENTRY_POINT_RENAME(uprv_ceil)
 #define uprv_compareASCIIPropertyNames U_ICU_ENTRY_POINT_RENAME(uprv_compareASCIIPropertyNames)
 #define uprv_compareEBCDICPropertyNames U_ICU_ENTRY_POINT_RENAME(uprv_compareEBCDICPropertyNames)

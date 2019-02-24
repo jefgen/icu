@@ -1528,6 +1528,8 @@ main(int argc, char* argv[])
       fprintf(stdout, " To run suppressed tests, use the -K option. \n");
     }
     if (major.getErrors() == 0) {
+        uprv_printMemoryStats();
+
         /* Call it twice to make sure that the defaults were reset. */
         /* Call it before the OK message to verify proper cleanup. */
         u_cleanup();

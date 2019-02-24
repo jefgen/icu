@@ -64,6 +64,9 @@ uprv_free(void *mem);
 U_CAPI void * U_EXPORT2
 uprv_calloc(size_t num, size_t size) U_MALLOC_ATTR U_ALLOC_SIZE_ATTR2(1,2);
 
+U_CAPI void U_EXPORT2
+uprv_printMemoryStats();
+
 /**
  * This should align the memory properly on any machine.
  * This is very useful for the safeClone functions.

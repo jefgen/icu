@@ -26,6 +26,8 @@
 #include "uassert.h"
 #include <stdlib.h>
 
+#define UPRV_MALLOC_COUNT 1
+
 /* uprv_malloc(0) returns a pointer to this read-only data. */
 static const int32_t zeroMem[] = {0, 0, 0, 0, 0, 0};
 
@@ -35,20 +37,22 @@ static UMemAllocFn    *pAlloc;
 static UMemReallocFn  *pRealloc;
 static UMemFreeFn     *pFree;
 
-#if U_DEBUG && defined(UPRV_MALLOC_COUNT)
+#if U_DEBUG
 #include <stdio.h>
-static int n=0;
-static long b=0; 
+static uint64_t n = 0; // calls to malloc
+static uint64_t b = 0; // total bytes
 #endif
 
 U_CAPI void * U_EXPORT2
 uprv_malloc(size_t s) {
 #if U_DEBUG && defined(UPRV_MALLOC_COUNT)
-#if 1
+#if 0
   putchar('>');
   fflush(stdout);
 #else
-  fprintf(stderr,"MALLOC\t#%d\t%ul bytes\t%ul total\n", ++n,s,(b+=s)); fflush(stderr);
+  //fprintf(stderr,"MALLOC\t#%lu\t%lu bytes\t%ld total\n", ++n,s,(b+=s)); fflush(stderr);
+  n++;
+  b+=s;
 #endif
 #endif
     if (s > 0) {
@@ -65,8 +69,8 @@ uprv_malloc(size_t s) {
 U_CAPI void * U_EXPORT2
 uprv_realloc(void * buffer, size_t size) {
 #if U_DEBUG && defined(UPRV_MALLOC_COUNT)
-  putchar('~');
-  fflush(stdout);
+  //putchar('~');
+  //fflush(stdout);
 #endif
     if (buffer == zeroMem) {
         return uprv_malloc(size);
@@ -89,8 +93,8 @@ uprv_realloc(void * buffer, size_t size) {
 U_CAPI void U_EXPORT2
 uprv_free(void *buffer) {
 #if U_DEBUG && defined(UPRV_MALLOC_COUNT)
-  putchar('<');
-  fflush(stdout);
+  //putchar('<');
+  //fflush(stdout);
 #endif
     if (buffer != zeroMem) {
         if (pFree) {
@@ -136,3 +140,13 @@ U_CFUNC UBool cmemory_cleanup(void) {
     pFree      = NULL;
     return TRUE;
 }
+
+U_CAPI void U_EXPORT2
+uprv_printMemoryStats(){
+#if U_DEBUG && defined(UPRV_MALLOC_COUNT)
+    fprintf(stderr, "\nMALLOC\tcalls=%lu\ttotal=%lu bytes\n", n, b);
+    fflush(stderr);
+#endif
+}
+
+

@@ -152,6 +152,10 @@ U_STABLE void U_EXPORT2
 u_setMemoryFunctions(const void *context, UMemAllocFn * U_CALLCONV_FPTR a, UMemReallocFn * U_CALLCONV_FPTR r, UMemFreeFn * U_CALLCONV_FPTR f, 
                     UErrorCode *status);
 
+#if U_DEBUG
+U_CAPI void U_EXPORT2 uprv_printMemoryStats();
+#endif
+
 U_CDECL_END
 
 #ifndef U_HIDE_DEPRECATED_API

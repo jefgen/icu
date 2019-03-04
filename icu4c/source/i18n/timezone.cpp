@@ -269,20 +269,21 @@ UResourceBundle* TimeZone::loadRule(const UResourceBundle* top, const UnicodeStr
 /**
  * Given an ID, open the appropriate resource for the given time zone.
  * Dereference aliases if necessary.
+ * @param top top-level resource bundle to fill-in.
  * @param id zone id
  * @param res resource, which must be ready for use (initialized but not open)
  * @param ec input-output error code
- * @return top-level resource bundle
  */
-static UResourceBundle* openOlsonResource(const UnicodeString& id,
-                                          UResourceBundle& res,
-                                          UErrorCode& ec)
+static void openOlsonResource(UResourceBundle* top,
+                              const UnicodeString& id,
+                              UResourceBundle& res,
+                              UErrorCode& ec)
 {
 #ifdef U_DEBUG_TZ
     char buf[128];
     id.extract(0, sizeof(buf)-1, buf, sizeof(buf), "");
 #endif
-    UResourceBundle *top = ures_openDirect(0, kZONEINFO, &ec);
+    ures_openDirectFillIn(top, 0, kZONEINFO, &ec);
     U_DEBUG_TZ_MSG(("pre: res sz=%d\n", ures_getSize(&res)));
     /* &res = */ getZoneByName(top, id, &res, ec);
     // Dereference if this is an alias.  Docs say result should be 1
@@ -291,15 +292,14 @@ static UResourceBundle* openOlsonResource(const UnicodeString& id,
     if (ures_getType(&res) == URES_INT) {
         int32_t deref = ures_getInt(&res, &ec) + 0;
         U_DEBUG_TZ_MSG(("getInt: %s - type is %d\n", u_errorName(ec), ures_getType(&res)));
-        UResourceBundle *ares = ures_getByKey(top, kZONES, NULL, &ec); // dereference Zones section
-        ures_getByIndex(ares, deref, &res, &ec);
-        ures_close(ares);
+        StackUResourceBundle ares;
+        ures_getByKey(top, kZONES, ares.getAlias(), &ec); // dereference Zones section
+        ures_getByIndex(ares.getAlias(), deref, &res, &ec);
         U_DEBUG_TZ_MSG(("alias to #%d (%s) - %s\n", deref, "??", u_errorName(ec)));
     } else {
         U_DEBUG_TZ_MSG(("not an alias - size %d\n", ures_getSize(&res)));
     }
     U_DEBUG_TZ_MSG(("%s - final status is %s\n", buf, u_errorName(ec)));
-    return top;
 }
 
 // -------------------------------------
@@ -393,17 +393,17 @@ createSystemTimeZone(const UnicodeString& id, UErrorCode& ec) {
     }
     TimeZone* z = 0;
     StackUResourceBundle res;
+    StackUResourceBundle top;
     U_DEBUG_TZ_MSG(("pre-err=%s\n", u_errorName(ec)));
-    UResourceBundle *top = openOlsonResource(id, res.ref(), ec);
+    openOlsonResource(top.getAlias(), id, res.ref(), ec);
     U_DEBUG_TZ_MSG(("post-err=%s\n", u_errorName(ec)));
     if (U_SUCCESS(ec)) {
-        z = new OlsonTimeZone(top, res.getAlias(), id, ec);
+        z = new OlsonTimeZone(top.getAlias(), res.getAlias(), id, ec);
         if (z == NULL) {
             ec = U_MEMORY_ALLOCATION_ERROR;
             U_DEBUG_TZ_MSG(("cstz: olson time zone failed to initialize - err %s\n", u_errorName(ec)));
         }
     }
-    ures_close(top);
     if (U_FAILURE(ec)) {
         U_DEBUG_TZ_MSG(("cstz: failed to create, err %s\n", u_errorName(ec)));
         delete z;
@@ -607,17 +607,18 @@ TimeZone::setDefault(const TimeZone& zone)
 static void U_CALLCONV initMap(USystemTimeZoneType type, UErrorCode& ec) {
     ucln_i18n_registerCleanup(UCLN_I18N_TIMEZONE, timeZone_cleanup);
 
-    UResourceBundle *res = ures_openDirect(0, kZONEINFO, &ec);
-    res = ures_getByKey(res, kNAMES, res, &ec); // dereference Zones section
+    StackUResourceBundle res;
+    ures_openDirectFillIn(res.getAlias(), 0, kZONEINFO, &ec);
+    ures_getByKey(res.getAlias(), kNAMES, res.getAlias(), &ec); // dereference Zones section
     if (U_SUCCESS(ec)) {
-        int32_t size = ures_getSize(res);
+        int32_t size = ures_getSize(res.getAlias());
         int32_t *m = (int32_t *)uprv_malloc(size * sizeof(int32_t));
         if (m == NULL) {
             ec = U_MEMORY_ALLOCATION_ERROR;
         } else {
             int32_t numEntries = 0;
             for (int32_t i = 0; i < size; i++) {
-                UnicodeString id = ures_getUnicodeStringByIndex(res, i, &ec);
+                UnicodeString id = ures_getUnicodeStringByIndex(res.getAlias(), i, &ec);
                 if (U_FAILURE(ec)) {
                     break;
                 }
@@ -677,7 +678,6 @@ static void U_CALLCONV initMap(USystemTimeZoneType type, UErrorCode& ec) {
             }
         }
     }
-    ures_close(res);
 }
 
 
@@ -756,16 +756,16 @@ private:
     UBool getID(int32_t i, UErrorCode& ec) {
         int32_t idLen = 0;
         const UChar* id = NULL;
-        UResourceBundle *top = ures_openDirect(0, kZONEINFO, &ec);
-        top = ures_getByKey(top, kNAMES, top, &ec); // dereference Zones section
-        id = ures_getStringByIndex(top, i, &idLen, &ec);
+        StackUResourceBundle top;
+        ures_openDirectFillIn(top.getAlias(), 0, kZONEINFO, &ec);
+        ures_getByKey(top.getAlias(), kNAMES, top.getAlias(), &ec); // dereference Zones section
+        id = ures_getStringByIndex(top.getAlias(), i, &idLen, &ec);
         if(U_FAILURE(ec)) {
             unistr.truncate(0);
         }
         else {
             unistr.fastCopyFrom(UnicodeString(TRUE, id, idLen));
         }
-        ures_close(top);
         return U_SUCCESS(ec);
     }
 
@@ -832,11 +832,12 @@ public:
             }
 
             // Walk through the base map
-            UResourceBundle *res = ures_openDirect(0, kZONEINFO, &ec);
-            res = ures_getByKey(res, kNAMES, res, &ec); // dereference Zones section
+            StackUResourceBundle res;
+            ures_openDirectFillIn(res.getAlias(), 0, kZONEINFO, &ec);
+            ures_getByKey(res.getAlias(), kNAMES, res.getAlias(), &ec); // dereference Zones section
             for (int32_t i = 0; i < baseLen; i++) {
                 int32_t zidx = baseMap[i];
-                UnicodeString id = ures_getUnicodeStringByIndex(res, zidx, &ec);
+                UnicodeString id = ures_getUnicodeStringByIndex(res.getAlias(), zidx, &ec);
                 if (U_FAILURE(ec)) {
                     break;
                 }
@@ -885,8 +886,6 @@ public:
                 uprv_free(filteredMap);
                 filteredMap = NULL;
             }
-
-            ures_close(res);
         }
 
         TZEnumeration *result = NULL;
@@ -1001,14 +1000,14 @@ TimeZone::countEquivalentIDs(const UnicodeString& id) {
     int32_t result = 0;
     UErrorCode ec = U_ZERO_ERROR;
     StackUResourceBundle res;
+    StackUResourceBundle top;
     U_DEBUG_TZ_MSG(("countEquivalentIDs..\n"));
-    UResourceBundle *top = openOlsonResource(id, res.ref(), ec);
+    openOlsonResource(top.getAlias(), id, res.ref(), ec);
     if (U_SUCCESS(ec)) {
         StackUResourceBundle r;
         ures_getByKey(res.getAlias(), kLINKS, r.getAlias(), &ec);
         ures_getIntVector(r.getAlias(), &result, &ec);
     }
-    ures_close(top);
     return result;
 }
 
@@ -1020,7 +1019,8 @@ TimeZone::getEquivalentID(const UnicodeString& id, int32_t index) {
     UnicodeString result;
     UErrorCode ec = U_ZERO_ERROR;
     StackUResourceBundle res;
-    UResourceBundle *top = openOlsonResource(id, res.ref(), ec);
+    StackUResourceBundle top;
+    openOlsonResource(top.getAlias(), id, res.ref(), ec);
     int32_t zone = -1;
     if (U_SUCCESS(ec)) {
         StackUResourceBundle r;
@@ -1034,16 +1034,15 @@ TimeZone::getEquivalentID(const UnicodeString& id, int32_t index) {
         }
     }
     if (zone >= 0) {
-        UResourceBundle *ares = ures_getByKey(top, kNAMES, NULL, &ec); // dereference Zones section
+        StackUResourceBundle ares;
+        ures_getByKey(top.getAlias(), kNAMES, ares.getAlias(), &ec); // dereference Zones section
         if (U_SUCCESS(ec)) {
             int32_t idLen = 0;
-            const UChar* id2 = ures_getStringByIndex(ares, zone, &idLen, &ec);
+            const UChar *id2 = ures_getStringByIndex(ares.getAlias(), zone, &idLen, &ec);
             result.fastCopyFrom(UnicodeString(TRUE, id2, idLen));
             U_DEBUG_TZ_MSG(("gei(%d) -> %d, len%d, %s\n", index, zone, result.length(), u_errorName(ec)));
         }
-        ures_close(ares);
     }
-    ures_close(top);
 #if defined(U_DEBUG_TZ)
     if(result.length() ==0) {
       U_DEBUG_TZ_MSG(("equiv [__, #%d] -> 0 (%s)\n", index, u_errorName(ec)));
@@ -1060,17 +1059,17 @@ const UChar*
 TimeZone::findID(const UnicodeString& id) {
     const UChar *result = NULL;
     UErrorCode ec = U_ZERO_ERROR;
-    UResourceBundle *rb = ures_openDirect(NULL, kZONEINFO, &ec);
+    StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, kZONEINFO, &ec);
 
     // resolve zone index by name
-    UResourceBundle *names = ures_getByKey(rb, kNAMES, NULL, &ec);
-    int32_t idx = findInStringArray(names, id, ec);
-    result = ures_getStringByIndex(names, idx, NULL, &ec);
+    StackUResourceBundle names;
+    ures_getByKey(rb.getAlias(), kNAMES, names.getAlias(), &ec);
+    int32_t idx = findInStringArray(names.getAlias(), id, ec);
+    result = ures_getStringByIndex(names.getAlias(), idx, NULL, &ec);
     if (U_FAILURE(ec)) {
         result = NULL;
     }
-    ures_close(names);
-    ures_close(rb);
     return result;
 }
 
@@ -1079,30 +1078,29 @@ const UChar*
 TimeZone::dereferOlsonLink(const UnicodeString& id) {
     const UChar *result = NULL;
     UErrorCode ec = U_ZERO_ERROR;
-    UResourceBundle *rb = ures_openDirect(NULL, kZONEINFO, &ec);
+    StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, kZONEINFO, &ec);
 
     // resolve zone index by name
-    UResourceBundle *names = ures_getByKey(rb, kNAMES, NULL, &ec);
-    int32_t idx = findInStringArray(names, id, ec);
-    result = ures_getStringByIndex(names, idx, NULL, &ec);
+    StackUResourceBundle names;
+    ures_getByKey(rb.getAlias(), kNAMES, names.getAlias(), &ec);
+    int32_t idx = findInStringArray(names.getAlias(), id, ec);
+    result = ures_getStringByIndex(names.getAlias(), idx, NULL, &ec);
 
     // open the zone bundle by index
-    ures_getByKey(rb, kZONES, rb, &ec);
-    ures_getByIndex(rb, idx, rb, &ec); 
+    ures_getByKey(rb.getAlias(), kZONES, rb.getAlias(), &ec);
+    ures_getByIndex(rb.getAlias(), idx, rb.getAlias(), &ec);
 
     if (U_SUCCESS(ec)) {
-        if (ures_getType(rb) == URES_INT) {
+        if (ures_getType(rb.getAlias()) == URES_INT) {
             // this is a link - dereference the link
-            int32_t deref = ures_getInt(rb, &ec);
-            const UChar* tmp = ures_getStringByIndex(names, deref, NULL, &ec);
+            int32_t deref = ures_getInt(rb.getAlias(), &ec);
+            const UChar *tmp = ures_getStringByIndex(names.getAlias(), deref, NULL, &ec);
             if (U_SUCCESS(ec)) {
                 result = tmp;
             }
         }
     }
-
-    ures_close(names);
-    ures_close(rb);
 
     return result;
 }
@@ -1119,21 +1117,20 @@ TimeZone::getRegion(const UnicodeString& id, UErrorCode& status) {
         return NULL;
     }
     const UChar *result = NULL;
-    UResourceBundle *rb = ures_openDirect(NULL, kZONEINFO, &status);
+    StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, kZONEINFO, &status);
 
     // resolve zone index by name
-    UResourceBundle *res = ures_getByKey(rb, kNAMES, NULL, &status);
-    int32_t idx = findInStringArray(res, id, status);
+    StackUResourceBundle res;
+    ures_getByKey(rb.getAlias(), kNAMES, res.getAlias(), &status);
+    int32_t idx = findInStringArray(res.getAlias(), id, status);
 
     // get region mapping
-    ures_getByKey(rb, kREGIONS, res, &status);
-    const UChar *tmp = ures_getStringByIndex(res, idx, NULL, &status);
+    ures_getByKey(rb.getAlias(), kREGIONS, res.getAlias(), &status);
+    const UChar *tmp = ures_getStringByIndex(res.getAlias(), idx, NULL, &status);
     if (U_SUCCESS(status)) {
         result = tmp;
     }
-
-    ures_close(res);
-    ures_close(rb);
 
     return result;
 }
@@ -1576,9 +1573,9 @@ TimeZone::getWindowsID(const UnicodeString& id, UnicodeString& winid, UErrorCode
         }
         return winid;
     }
-
-    UResourceBundle *mapTimezones = ures_openDirect(NULL, "windowsZones", &status);
-    ures_getByKey(mapTimezones, "mapTimezones", mapTimezones, &status);
+    StackUResourceBundle mapTimezones;
+    ures_openDirectFillIn(mapTimezones.getAlias(), NULL, "windowsZones", &status);
+    ures_getByKey(mapTimezones.getAlias(), "mapTimezones", mapTimezones.getAlias(), &status);
 
     if (U_FAILURE(status)) {
         return winid;
@@ -1586,8 +1583,8 @@ TimeZone::getWindowsID(const UnicodeString& id, UnicodeString& winid, UErrorCode
 
     UResourceBundle *winzone = NULL;
     UBool found = FALSE;
-    while (ures_hasNext(mapTimezones) && !found) {
-        winzone = ures_getNextResource(mapTimezones, winzone, &status);
+    while (ures_hasNext(mapTimezones.getAlias()) && !found) {
+        winzone = ures_getNextResource(mapTimezones.getAlias(), winzone, &status);
         if (U_FAILURE(status)) {
             break;
         }
@@ -1628,7 +1625,6 @@ TimeZone::getWindowsID(const UnicodeString& id, UnicodeString& winid, UErrorCode
         ures_close(regionalData);
     }
     ures_close(winzone);
-    ures_close(mapTimezones);
 
     return winid;
 }
@@ -1642,10 +1638,10 @@ TimeZone::getIDForWindowsID(const UnicodeString& winid, const char* region, Unic
         return id;
     }
 
-    UResourceBundle *zones = ures_openDirect(NULL, "windowsZones", &status);
-    ures_getByKey(zones, "mapTimezones", zones, &status);
+    StackUResourceBundle zones;
+    ures_openDirectFillIn(zones.getAlias(), NULL, "windowsZones", &status);
+    ures_getByKey(zones.getAlias(), "mapTimezones", zones.getAlias(), &status);
     if (U_FAILURE(status)) {
-        ures_close(zones);
         return id;
     }
 
@@ -1654,15 +1650,13 @@ TimeZone::getIDForWindowsID(const UnicodeString& winid, const char* region, Unic
     int32_t winKeyLen = winid.extract(0, winid.length(), winidKey, sizeof(winidKey) - 1, US_INV);
 
     if (winKeyLen == 0 || winKeyLen >= (int32_t)sizeof(winidKey)) {
-        ures_close(zones);
         return id;
     }
     winidKey[winKeyLen] = 0;
 
-    ures_getByKey(zones, winidKey, zones, &tmperr); // use tmperr, because windows mapping might not
-                                                    // be avaiable by design
+    ures_getByKey(zones.getAlias(), winidKey, zones.getAlias(), &tmperr); // use tmperr, because windows mapping might not
+                                                                          // be avaiable by design
     if (U_FAILURE(tmperr)) {
-        ures_close(zones);
         return id;
     }
 
@@ -1670,8 +1664,8 @@ TimeZone::getIDForWindowsID(const UnicodeString& winid, const char* region, Unic
     int32_t len = 0;
     UBool gotID = FALSE;
     if (region) {
-        const UChar *tzids = ures_getStringByKey(zones, region, &len, &tmperr); // use tmperr, because
-                                                                                // regional mapping is optional
+        const UChar *tzids = ures_getStringByKey(zones.getAlias(), region, &len, &tmperr); // use tmperr, because
+                                                                                           // regional mapping is optional
         if (U_SUCCESS(tmperr)) {
             // first ID delimited by space is the defasult one
             const UChar *end = u_strchr(tzids, (UChar)0x20);
@@ -1685,14 +1679,13 @@ TimeZone::getIDForWindowsID(const UnicodeString& winid, const char* region, Unic
     }
 
     if (!gotID) {
-        tzid = ures_getStringByKey(zones, "001", &len, &status);    // using status, because "001" must be
-                                                                // available at this point
+        tzid = ures_getStringByKey(zones.getAlias(), "001", &len, &status); // using status, because "001" must be
+                                                                            // available at this point
         if (U_SUCCESS(status)) {
             id.setTo(tzid, len);
         }
     }
 
-    ures_close(zones);
     return id;
 }
 

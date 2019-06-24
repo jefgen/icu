@@ -469,29 +469,38 @@ def generate_tree(
     if use_pool_bundle:
         input_pool_files = [OutFile("%spool.res" % out_prefix)]
         pool_target_name = "%s_pool_write" % sub_dir
+        pool_list_target_name = "%s_pool_list" % sub_dir
         use_pool_bundle_option = "--usePoolBundle {OUT_DIR}/{OUT_PREFIX}".format(
             OUT_PREFIX = out_prefix,
             **common_vars
         )
+        pool_list_file = TmpFile("{IN_SUB_DIR}/pool_list.txt".format(
+            IN_SUB_DIR = sub_dir,
+            **common_vars
+        ))
         requests += [
+            PrintFileRequest(
+                name = pool_list_target_name,
+                output_file = pool_list_file,
+                content = "\n".join(input_basenames)
+            ),
             SingleExecutionRequest(
                 name = pool_target_name,
                 category = category,
-                dep_targets = dep_targets,
+                dep_targets = dep_targets + [pool_list_file],
                 input_files = input_files,
                 output_files = input_pool_files,
                 tool = IcuTool("genrb"),
                 args = "-s {IN_DIR}/{IN_SUB_DIR} -d {OUT_DIR}/{OUT_PREFIX} -i {OUT_DIR} "
-                    "--writePoolBundle -k "
-                    "{INPUT_BASENAMES_SPACED}",
+                    "--writePoolBundle -k --fileList {TMP_DIR}/{IN_SUB_DIR}/pool_list.txt",
                 format_with = {
                     "IN_SUB_DIR": sub_dir,
-                    "OUT_PREFIX": out_prefix,
-                    "INPUT_BASENAMES_SPACED": utils.SpaceSeparatedList(input_basenames)
+                    "OUT_PREFIX": out_prefix
                 }
             ),
         ]
         dep_targets = dep_targets + [DepTarget(pool_target_name)]
+        # can we just add here?
     else:
         use_pool_bundle_option = ""
 

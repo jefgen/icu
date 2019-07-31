@@ -196,7 +196,6 @@ class NumberRangeFormatterImpl;
 } // namespace icu::number
 U_NAMESPACE_END
 
-template struct U_I18N_API std::atomic< U_NAMESPACE_QUALIFIER number::impl::NumberRangeFormatterImpl*>;
 
 U_NAMESPACE_BEGIN
 namespace number {  // icu::number

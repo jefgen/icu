@@ -109,5 +109,7 @@ class NumberRangeFormatterImpl : public UMemory {
 } // namespace number
 U_NAMESPACE_END
 
+template struct U_I18N_API std::atomic< U_NAMESPACE_QUALIFIER number::impl::NumberRangeFormatterImpl*>;
+
 #endif //__SOURCE_NUMRANGE_TYPES_H__
 #endif /* #if !UCONFIG_NO_FORMATTING */

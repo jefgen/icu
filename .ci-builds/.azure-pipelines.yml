@@ -137,13 +137,13 @@ jobs:
       - Cmd
   steps:
     - powershell: |
-        $filterPath = $Env:BUILD_SOURCESDIRECTORY + "\.ci-builds\data-filter.json"
-        $vstsCommandString = "vso[task.setvariable variable=ICU_DATA_FILTER_FILE]" + $filterPath
-        Write-Host "##$vstsCommandString"
+        $longIcuPath = $Env:BUILD_SOURCESDIRECTORY + "\this-here-is-a-really-really-rather-overly-long-name-for-a-directory"
+        New-Item -Path $longIcuPath -ItemType "Directory"
+        Move-Item -Path "$Env:BUILD_SOURCESDIRECTORY\icu4c" -Destination $longIcuPath
     - task: VSBuild@1
       displayName: 'Build Solution with Data Filter'
       inputs:
-        solution: icu4c/source/allinone/allinone.sln
+        solution: this-here-is-a-really-really-rather-overly-long-name-for-a-directory/icu4c/source/allinone/allinone.sln
         platform: x64
         configuration: Release
         msbuildArgs: '/p:SkipUWP=true'

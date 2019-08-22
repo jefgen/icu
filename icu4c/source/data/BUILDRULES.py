@@ -464,6 +464,19 @@ def generate_tree(
         OutFile("%s%s.res" % (out_prefix, v[:-4]))
         for v in input_basenames
     ]
+    # Create a temp file that contains the list of input files for genrb
+    input_file_list_target_name = "%s_input_list" % sub_dir
+    input_file_list = TmpFile("{IN_SUB_DIR}/file_list.txt".format(
+        IN_SUB_DIR = sub_dir,
+        **common_vars
+    ))
+    requests += [
+        PrintFileRequest(
+            name = input_file_list_target_name,
+            output_file = input_file_list,
+            content = "\n".join(input_basenames)
+        )
+    ]
 
     # Generate Pool Bundle
     if use_pool_bundle:
@@ -477,19 +490,17 @@ def generate_tree(
             SingleExecutionRequest(
                 name = pool_target_name,
                 category = category,
-                dep_targets = dep_targets,
+                dep_targets = dep_targets + [DepTarget(input_file_list_target_name)],
                 input_files = input_files,
                 output_files = input_pool_files,
                 tool = IcuTool("genrb"),
                 args = "-s {IN_DIR}/{IN_SUB_DIR} -d {OUT_DIR}/{OUT_PREFIX} -i {OUT_DIR} "
-                    "--writePoolBundle -k "
-                    "{INPUT_BASENAMES_SPACED}",
+                    "--writePoolBundle -k --fileList {TMP_DIR}/{IN_SUB_DIR}/file_list.txt",
                 format_with = {
                     "IN_SUB_DIR": sub_dir,
-                    "OUT_PREFIX": out_prefix,
-                    "INPUT_BASENAMES_SPACED": utils.SpaceSeparatedList(input_basenames)
+                    "OUT_PREFIX": out_prefix
                 }
-            ),
+            )
         ]
         dep_targets = dep_targets + [DepTarget(pool_target_name)]
     else:
@@ -497,23 +508,22 @@ def generate_tree(
 
     # Generate Res File Tree
     requests += [
-        RepeatedOrSingleExecutionRequest(
+        # Note: Using a SingleExecutionRequest here instead of RepeatedOrSingleExecutionRequest, in order to
+        # move the decision about whether or not to concatenate input arguments here, rather than later on dynamically.
+        # We need the decision to be made here so that we can force it to add a DepTarget here for the TmpFile.
+        SingleExecutionRequest(
             name = "%s_res" % sub_dir,
             category = category,
-            dep_targets = dep_targets,
+            dep_targets = dep_targets + [DepTarget(input_file_list_target_name)],
             input_files = input_files,
             output_files = output_files,
             tool = IcuTool("genrb"),
             args = "-s {IN_DIR}/{IN_SUB_DIR} -d {OUT_DIR}/{OUT_PREFIX} -i {OUT_DIR} "
-                "{EXTRA_OPTION} -k "
-                "{INPUT_BASENAME}",
+                "{EXTRA_OPTION} -k --fileList {TMP_DIR}/{IN_SUB_DIR}/file_list.txt",
             format_with = {
                 "IN_SUB_DIR": sub_dir,
                 "OUT_PREFIX": out_prefix,
                 "EXTRA_OPTION": use_pool_bundle_option
-            },
-            repeat_with = {
-                "INPUT_BASENAME": utils.SpaceSeparatedList(input_basenames)
             }
         )
     ]

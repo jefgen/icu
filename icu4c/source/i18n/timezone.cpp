@@ -446,6 +446,7 @@ TimeZone::createTimeZone(const UnicodeString& ID)
         U_DEBUG_TZ_MSG(("failed to load time zone with id - falling to Etc/Unknown(GMT)"));
         const TimeZone& unknown = getUnknown();
         // Unknown zone uses staticly allocated memory, so creation of it can never fail due to OOM.
+        // However, SimpleTimeZone::clone() allocates memory and can fail.
         result = unknown.clone();
     }
     return result;

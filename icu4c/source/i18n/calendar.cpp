@@ -62,6 +62,7 @@
 #include "sharedcalendar.h"
 #include "unifiedcache.h"
 #include "ulocimp.h"
+#include "util.h"
 
 #if !UCONFIG_NO_SERVICE
 static icu::ICULocaleService* gService = NULL;
@@ -753,9 +754,9 @@ fSkippedWallTime(UCAL_WALLTIME_LAST)
         delete zone;
         return;
     }
-    if(zone == 0) {
+    if(zone == NULL) {
 #if defined (U_DEBUG_CAL)
-        fprintf(stderr, "%s:%d: ILLEGAL ARG because timezone cannot be 0\n",
+        fprintf(stderr, "%s:%d: ILLEGAL ARG because timezone cannot be NULL\n",
             __FILE__, __LINE__);
 #endif
         success = U_ILLEGAL_ARGUMENT_ERROR;
@@ -817,6 +818,19 @@ Calendar &
 Calendar::operator=(const Calendar &right)
 {
     if (this != &right) {
+        TimeZone *newZone = NULL;
+        if (right.fZone != NULL) {
+            newZone = right.fZone->clone();
+        }
+        if (newZone == NULL) {
+            // Either OOM occurred above, or the Calendar we are copying from is in an invalid state.
+            // However, we have no way to report it. Keep our existing TimeZone object, but set the ID
+            // to a bogus string.
+            fZone->setID(ICU_Utility::makeBogusString());
+        } else {
+            delete fZone;
+            fZone = newZone;
+        }
         uprv_arrayCopy(right.fFields, fFields, UCAL_FIELD_COUNT);
         uprv_arrayCopy(right.fIsSet, fIsSet, UCAL_FIELD_COUNT);
         uprv_arrayCopy(right.fStamp, fStamp, UCAL_FIELD_COUNT);
@@ -828,11 +842,6 @@ Calendar::operator=(const Calendar &right)
         fLenient                 = right.fLenient;
         fRepeatedWallTime        = right.fRepeatedWallTime;
         fSkippedWallTime         = right.fSkippedWallTime;
-        delete fZone;
-        fZone = NULL;
-        if (right.fZone != NULL) {
-            fZone                = right.fZone->clone();
-        }
         fFirstDayOfWeek          = right.fFirstDayOfWeek;
         fMinimalDaysInFirstWeek  = right.fMinimalDaysInFirstWeek;
         fWeekendOnset            = right.fWeekendOnset;
@@ -1053,6 +1062,8 @@ Calendar::isEquivalentTo(const Calendar& other) const
         fWeekendOnsetMillis     == other.fWeekendOnsetMillis &&
         fWeekendCease           == other.fWeekendCease &&
         fWeekendCeaseMillis     == other.fWeekendCeaseMillis &&
+        fZone                   != NULL &&
+        other.fZone             != NULL &&
         *fZone                  == *other.fZone;
 }
 
@@ -2393,9 +2404,10 @@ void
 Calendar::adoptTimeZone(TimeZone* zone)
 {
     // Do nothing if passed-in zone is NULL
-    if (zone == NULL) return;
+    if (zone == NULL) {
+        return;
+    }
 
-    // fZone should always be non-null
     delete fZone;
     fZone = zone;
 
@@ -2416,6 +2428,9 @@ const TimeZone&
 Calendar::getTimeZone() const
 {
     U_ASSERT(fZone != NULL);
+    // If fZone is NULL then OOM previously occurred and we are in an invalid state.
+    // The caller didn't check the error status of the constructor.
+    // Unfortunately, we have no good way to report this error.
     return *fZone;
 }
 
@@ -2427,7 +2442,8 @@ Calendar::orphanTimeZone()
     // we let go of the time zone; the new time zone is the system default time zone
     TimeZone *defaultZone = TimeZone::createDefault();
     if (defaultZone == NULL) {
-        // No error handling available. Must keep fZone non-NULL, there are many unchecked uses.
+        // Can't report back U_MEMORY_ALLOCATION_ERROR, but we can return NULL.
+        // In order to keep fZone non-NULL, we keep the existing time zone.
         return NULL;
     }
     TimeZone *z = fZone;
@@ -2977,6 +2993,13 @@ void Calendar::computeTime(UErrorCode& status) {
         if (U_FAILURE(status)) {
             return;
         }
+    }
+
+    UnicodeString zoneID;
+    if (fZone == NULL || fZone->getID(zoneID).isBogus()) {
+        // If fZone is NULL or has a Bogus ID, then OOM previously occurred.
+        status = U_MEMORY_ALLOCATION_ERROR;
+        return;
     }
 
     // Compute the Julian day
@@ -3955,10 +3978,10 @@ Calendar::internalSet(EDateFields field, int32_t value)
 
 BasicTimeZone*
 Calendar::getBasicTimeZone(void) const {
-    if (dynamic_cast<const OlsonTimeZone *>(fZone) != NULL
+    if ((fZone != NULL) && (dynamic_cast<const OlsonTimeZone *>(fZone) != NULL
         || dynamic_cast<const SimpleTimeZone *>(fZone) != NULL
         || dynamic_cast<const RuleBasedTimeZone *>(fZone) != NULL
-        || dynamic_cast<const VTimeZone *>(fZone) != NULL) {
+        || dynamic_cast<const VTimeZone *>(fZone) != NULL)) {
         return (BasicTimeZone*)fZone;
     }
     return NULL;

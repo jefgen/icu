@@ -847,6 +847,9 @@ public:
      * Returns the time zone owned by this calendar. The caller owns the returned object
      * and must delete it when done.  After this call, the new time zone associated
      * with this Calendar is the default TimeZone as returned by TimeZone::createDefault().
+     * 
+     * Note: If an out-of-memory error occurs while creating the default TimeZone, then
+     * this function returns NULL, and the time zone does not change.
      *
      * @return   The time zone object which was associated with this calendar.
      * @stable ICU 2.0

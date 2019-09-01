@@ -493,17 +493,11 @@ findFirstExisting(const char* path, char* name,
 }
 
 static void ures_setIsStackObject( UResourceBundle* resB, UBool state) {
-    if(state) {
-        resB->fMagic1 = 0;
-        resB->fMagic2 = 0;
-    } else {
-        resB->fMagic1 = MAGIC1;
-        resB->fMagic2 = MAGIC2;
-    }
+    resB->fIsStackAllocated = state;
 }
 
 static UBool ures_isStackObject(const UResourceBundle* resB) {
-  return((resB->fMagic1 == MAGIC1 && resB->fMagic2 == MAGIC2)?FALSE:TRUE);
+    return resB->fIsStackAllocated;
 }
 
 

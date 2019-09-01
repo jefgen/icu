@@ -27,9 +27,6 @@
 #define kVersionSeparator       "."
 #define kVersionTag             "Version"
 
-#define MAGIC1 19700503
-#define MAGIC2 19641227
-
 #define URES_MAX_ALIAS_LEVEL 256
 #define URES_MAX_BUFFER_SIZE 256
 
@@ -50,10 +47,11 @@ struct UResourceDataEntry {
     UResourceDataEntry *fParent; /*next resource in fallback chain*/
     UResourceDataEntry *fAlias;
     UResourceDataEntry *fPool;
-    ResourceData fData; /* data for low level access */
-    char fNameBuffer[3]; /* A small buffer of free space for fName. The free space is due to struct padding. */
+    char fNameBuffer[sizeof(void *)]; /* A small buffer of free space for fName. Size is 'sizeof(void*)' so there is no wasted padding. */
     uint32_t fCountExisting; /* how much is this resource used */
     UErrorCode fBogus;
+    ResourceData fData; /* data for low level access */
+    
     /* int32_t fHashKey;*/ /* for faster access in the hashtable */
 };
 
@@ -76,8 +74,7 @@ struct UResourceBundle {
     Resource fRes;
     UBool fHasFallback;
     UBool fIsTopLevel;
-    uint32_t fMagic1;   /* For determining if it's a stack object */
-    uint32_t fMagic2;   /* For determining if it's a stack object */
+    UBool fIsStackAllocated; /* For determining if it's a stack object */
     int32_t fIndex;
     int32_t fSize;
 

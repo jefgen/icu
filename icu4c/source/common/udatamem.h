@@ -31,9 +31,6 @@ struct UDataMemory {
                                    /*   UDataMemory object.                           */
     const void       *toc;         /* For common memory, table of contents for        */
                                    /*   the pieces within.                            */
-    UBool             heapAllocated;  /* True if this UDataMemory Object is on the    */
-                                   /*  heap and thus needs to be deleted when closed. */
-
     void             *mapAddr;     /* For mapped or allocated memory, the start addr. */
                                    /* Only non-null if a close operation should unmap */
                                    /*  the associated data.                           */
@@ -42,6 +39,9 @@ struct UDataMemory {
                                    /*  the associated data, and additional info       */
                                    /*   beyond the mapAddr is needed to do that.      */
     int32_t           length;      /* Length of the data in bytes; -1 if unknown.     */
+    
+    UBool heapAllocated;           /* True if this UDataMemory Object is on the       */
+                                   /*  heap and thus needs to be deleted when closed. */
 };
 
 U_CFUNC UDataMemory *UDataMemory_createNewInstance(UErrorCode *pErr);

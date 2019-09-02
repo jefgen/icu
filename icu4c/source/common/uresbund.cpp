@@ -2544,7 +2544,7 @@ static const UEnumeration gLocalesEnum = {
 U_CAPI UEnumeration* U_EXPORT2
 ures_openAvailableLocales(const char *path, UErrorCode *status)
 {
-    UResourceBundle *idx = NULL;
+    StackUResourceBundle idx;
     UEnumeration *en = NULL;
     ULocalesContext *myContext = NULL;
 
@@ -2563,8 +2563,8 @@ ures_openAvailableLocales(const char *path, UErrorCode *status)
 
     ures_initStackObject(&myContext->installed);
     ures_initStackObject(&myContext->curr);
-    idx = ures_openDirect(path, INDEX_LOCALE_NAME, status);
-    ures_getByKey(idx, INDEX_TAG, &myContext->installed, status);
+    ures_openDirectFillIn(idx.getAlias(), path, INDEX_LOCALE_NAME, status);
+    ures_getByKey(idx.getAlias(), INDEX_TAG, &myContext->installed, status);
     if(U_SUCCESS(*status)) {
 #if defined(URES_TREE_DEBUG)
         fprintf(stderr, "Got %s::%s::[%s] : %s\n", 
@@ -2580,8 +2580,6 @@ ures_openAvailableLocales(const char *path, UErrorCode *status)
         uprv_free(en);
         en = NULL;
     }
-    
-    ures_close(idx);
     
     return en;
 }
@@ -2934,10 +2932,10 @@ ures_getKeywordValues(const char *path, const char *keyword, UErrorCode *status)
     valuesBuf[1]=0;
     
     while((locale = uenum_next(locs, &locLen, status)) != 0) {
-        UResourceBundle   *bund = NULL;
+        StackUResourceBundle bund;
         UResourceBundle   *subPtr = NULL;
         UErrorCode subStatus = U_ZERO_ERROR; /* don't fail if a bundle is unopenable */
-        bund = ures_openDirect(path, locale, &subStatus);
+        ures_openDirectFillIn(bund.getAlias(), path, locale, &subStatus);
         
 #if defined(URES_TREE_DEBUG)
         if(!bund || U_FAILURE(subStatus)) {
@@ -2945,16 +2943,14 @@ ures_getKeywordValues(const char *path, const char *keyword, UErrorCode *status)
                 path?path:"<ICUDATA>", keyword, locale, u_errorName(subStatus));
         }
 #endif
-        
-        ures_getByKey(bund, keyword, &item, &subStatus);
-        
-        if(!bund || U_FAILURE(subStatus)) {
+
+        ures_getByKey(bund.getAlias(), keyword, &item, &subStatus);
+
+        if(bund.getAlias() == nullptr || U_FAILURE(subStatus)) {
 #if defined(URES_TREE_DEBUG)
             fprintf(stderr, "%s-%s values: Can't find in %s - skipping. (%s)\n", 
                 path?path:"<ICUDATA>", keyword, locale, u_errorName(subStatus));
 #endif
-            ures_close(bund);
-            bund = NULL;
             continue;
         }
         
@@ -2995,7 +2991,6 @@ ures_getKeywordValues(const char *path, const char *keyword, UErrorCode *status)
                 }
             }
         }
-        ures_close(bund);
     }
     valuesBuf[valuesIndex++] = 0; /* terminate */
     

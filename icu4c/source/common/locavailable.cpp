@@ -212,7 +212,8 @@ static UBool U_CALLCONV uloc_cleanup(void) {
 static void U_CALLCONV loadInstalledLocales(UErrorCode& status) {
     ucln_common_registerCleanup(UCLN_COMMON_ULOC, uloc_cleanup);
 
-    icu::LocalUResourceBundlePointer rb(ures_openDirect(NULL, "res_index", &status));
+    icu::StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, "res_index", &status);
     AvailableLocalesSink sink;
     ures_getAllItemsWithFallback(rb.getAlias(), "", sink, status);
 }

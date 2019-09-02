@@ -193,15 +193,15 @@ ulocdata_getDelimiter(ULocaleData *uld, ULocaleDataDelimiterType type,
 
 static UResourceBundle * measurementTypeBundleForLocale(const char *localeID, const char *measurementType, UErrorCode *status){
     char region[ULOC_COUNTRY_CAPACITY];
-    UResourceBundle *rb;
+    icu::StackUResourceBundle rb;
     UResourceBundle *measTypeBundle = NULL;
     
     ulocimp_getRegionForSupplementalData(localeID, TRUE, region, ULOC_COUNTRY_CAPACITY, status);
     
-    rb = ures_openDirect(NULL, "supplementalData", status);
-    ures_getByKey(rb, "measurementData", rb, status);
-    if (rb != NULL) {
-        UResourceBundle *measDataBundle = ures_getByKey(rb, region, NULL, status);
+    ures_openDirectFillIn(rb.getAlias(), NULL, "supplementalData", status);
+    ures_getByKey(rb.getAlias(), "measurementData", rb.getAlias(), status);
+    if (rb.getAlias() != NULL) {
+        UResourceBundle *measDataBundle = ures_getByKey(rb.getAlias(), region, NULL, status);
         if (U_SUCCESS(*status)) {
         	measTypeBundle = ures_getByKey(measDataBundle, measurementType, NULL, status);
         }
@@ -210,12 +210,11 @@ static UResourceBundle * measurementTypeBundleForLocale(const char *localeID, co
             if (measDataBundle != NULL) {
                 ures_close(measDataBundle);
             }
-            measDataBundle = ures_getByKey(rb, "001", NULL, status);
+            measDataBundle = ures_getByKey(rb.getAlias(), "001", NULL, status);
             measTypeBundle = ures_getByKey(measDataBundle, measurementType, NULL, status);
         }
         ures_close(measDataBundle);
     }
-    ures_close(rb);
     return measTypeBundle;
 }
 
@@ -266,10 +265,9 @@ ulocdata_getPaperSize(const char* localeID, int32_t *height, int32_t *width, UEr
 
 U_CAPI void U_EXPORT2
 ulocdata_getCLDRVersion(UVersionInfo versionArray, UErrorCode *status) {
-    UResourceBundle *rb = NULL;
-    rb = ures_openDirect(NULL, "supplementalData", status);
-    ures_getVersionByKey(rb, "cldrVersion", versionArray, status);
-    ures_close(rb);
+    icu::StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, "supplementalData", status);
+    ures_getVersionByKey(rb.getAlias(), "cldrVersion", versionArray, status);
 }
 
 U_CAPI int32_t U_EXPORT2

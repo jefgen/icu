@@ -73,10 +73,10 @@ jobs:
       - visualstudio
       - Cmd
   steps:
+    - powershell: |
+        Write-Host "##vso[task.setvariable variable=CL]/Zc:twoPhase"
     - task: VSBuild@1
       displayName: 'Build Solution'
-      env:
-        CL: /Zc:twoPhase
       inputs:
         solution: icu4c/source/allinone/allinone.sln
         platform: x64

@@ -63,6 +63,30 @@ jobs:
         CC: clang
         CXX: clang++
 #-------------------------------------------------------------------------
+- job: ICU4C_MSVC_x64_Release_ZcTwoPhase
+  displayName: 'C: MSVC 64-bit Release (VS 2017) twoPhase'
+  timeoutInMinutes: 30
+  pool:
+    vmImage: 'vs2017-win2016'
+    demands: 
+      - msbuild
+      - visualstudio
+      - Cmd
+  steps:
+    - task: VSBuild@1
+      displayName: 'Build Solution'
+      env:
+        CL: /Zc:twoPhase
+      inputs:
+        solution: icu4c/source/allinone/allinone.sln
+        platform: x64
+        configuration: Release
+    - task: BatchScript@1
+      displayName: 'Run Tests (icucheck.bat)'
+      inputs:
+        filename: icu4c/source/allinone/icucheck.bat
+        arguments: 'x64 Release'
+#-------------------------------------------------------------------------
 - job: ICU4C_MSVC_x64_Release_Distrelease
   displayName: 'C: MSVC 64-bit Release (VS 2017) + Distrelease'
   timeoutInMinutes: 30

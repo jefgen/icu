@@ -64,17 +64,17 @@ jobs:
         CXX: clang++
 #-------------------------------------------------------------------------
 - job: ICU4C_MSVC_x64_Release_ZcTwoPhase
-  displayName: 'C: MSVC 64-bit Release (VS 2017) twoPhase'
+  displayName: 'C: MSVC 64-bit Release (VS 2019) twoPhase'
   timeoutInMinutes: 30
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-2019'
     demands: 
       - msbuild
       - visualstudio
       - Cmd
   steps:
-    - powershell: |
-        Write-Host "##vso[task.setvariable variable=CL]/Zc:twoPhase"
+#    - powershell: |
+#        Write-Host "##vso[task.setvariable variable=CL]/Zc:twoPhase"
     - task: VSBuild@1
       displayName: 'Build Solution'
       inputs:

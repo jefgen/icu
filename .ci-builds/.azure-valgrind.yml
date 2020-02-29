@@ -1,0 +1,50 @@
+# Azure Pipelines configuration for Valgrind for ICU4C.
+# 
+# Note: The valgrind test configuration is in a separate file
+# so that it can be run independently from the regular builds.
+#
+
+resources:
+  - repo: self
+    lfs: true
+    fetchDepth: 1
+
+# Only run the exhaustive tests on the master and maint branches, and
+# also batch up any pending changes so that we will only have at most
+# one build running at a given time (since they take a long time).
+#trigger:
+#  batch: true
+#  branches:
+#    include:
+#    - master
+#    - maint/*
+
+jobs:
+#-------------------------------------------------------------------------
+- job: ICU4C_Clang_Valgrind_Ubuntu_1604
+  displayName: 'C: Linux Clang Valgrind (Ubuntu 16.04)'
+  timeoutInMinutes: 100
+  pool:
+    vmImage: 'Ubuntu 16.04'
+  steps:
+    - script: |
+        set -ex
+        sudo apt -y update
+        sudo apt install -y valgrind
+      displayName: 'Install valgrind'
+    - script: |
+        cd icu4c/source && ./runConfigureICU --enable-debug Linux --disable-renaming --disable-layout --disable-layoutex && make -j2 tests
+      displayName: 'Build'
+    - script: |
+        cd icu4c/source/test/intltest && LD_LIBRARY_PATH=../../lib:../../stubdata:../../tools/ctestfw:$LD_LIBRARY_PATH valgrind --error-exitcode=1 ./intltest
+      displayName: 'Valgrind intltest'
+    - script: |
+        cd icu4c/source/test/cintltst && LD_LIBRARY_PATH=../../lib:../../stubdata:../../tools/ctestfw:$LD_LIBRARY_PATH valgrind --error-exitcode=1 ./cintltst
+      displayName: 'Valgrind cintltst'
+    - script: |
+        cd icu4c/source/test/iotest && LD_LIBRARY_PATH=../../lib:../../stubdata:../../tools/ctestfw:$LD_LIBRARY_PATH valgrind --error-exitcode=1 ./iotest
+      displayName: 'Valgrind iotest'
+      env:
+        CC: clang
+        CXX: clang++
+#-------------------------------------------------------------------------

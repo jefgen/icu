@@ -52,6 +52,7 @@
 #include "ulocimp.h"
 #include "umutex.h"
 #include "ustr_imp.h"
+#include "uresimp.h"
 
 U_CDECL_BEGIN
 static UBool U_CALLCONV locale_cleanup(void);
@@ -664,8 +665,10 @@ Locale& Locale::init(const char* localeID, UBool canonicalize)
         if (canonicalize) {
             UErrorCode status = U_ZERO_ERROR;
             // TODO: Try to use ResourceDataValue and ures_getValueWithFallback() etc.
-            LocalUResourceBundlePointer metadata(ures_openDirect(NULL, "metadata", &status));
-            LocalUResourceBundlePointer metadataAlias(ures_getByKey(metadata.getAlias(), "alias", NULL, &status));
+            StackUResourceBundle metadata;
+            ures_openDirectFillIn(metadata.getAlias(), NULL, "metadata", &status);
+            StackUResourceBundle metadataAlias;
+            ures_getByKey(metadata.getAlias(), "alias", metadataAlias.getAlias(), &status);
             // Look up the metadata:alias:language:$key:replacement entries
             // key could be one of the following:
             //   language
@@ -696,7 +699,8 @@ Locale& Locale::init(const char* localeID, UBool canonicalize)
                 //     ...
                 //   }
                 // }
-                LocalUResourceBundlePointer languageAlias(ures_getByKey(metadataAlias.getAlias(), "language", NULL, &status));
+                StackUResourceBundle languageAlias;
+                ures_getByKey(metadataAlias.getAlias(), "language", languageAlias.getAlias(), &status);
                 if (U_FAILURE(status))
                     break;
                 CharString temp;
@@ -713,10 +717,8 @@ Locale& Locale::init(const char* localeID, UBool canonicalize)
                         end = uprv_strchr(begin, '_');
                         int32_t len = (end == nullptr) ? int32_t(uprv_strlen(begin)) : int32_t(end - begin);
                         temp.clear().append(getLanguage(), status).append("_", status).append(begin, len, status);
-                        LocalUResourceBundlePointer languageVariantAlias(
-                            ures_getByKey(languageAlias.getAlias(),
-                                          temp.data(),
-                                          NULL, &status));
+                        StackUResourceBundle languageVariantAlias;
+                        ures_getByKey(languageAlias.getAlias(), temp.data(), languageVariantAlias.getAlias(), &status);
                         temp.clear().appendInvariantChars(
                             UnicodeString(ures_getStringByKey(languageVariantAlias.getAlias(), "replacement", nullptr, &status)), status);
                         if (U_SUCCESS(status)) {
@@ -748,10 +750,10 @@ Locale& Locale::init(const char* localeID, UBool canonicalize)
                 if (getScript() != nullptr && getScript()[0] != '\0' &&
                         getCountry() != nullptr && getCountry()[0] != '\0') {
                     status = U_ZERO_ERROR;
-                    LocalUResourceBundlePointer replacedAlias(
-                        ures_getByKey(languageAlias.getAlias(),
-                                      AppendLSCVE(temp.clear(), getLanguage(), getScript(), getCountry(),
-                                                  nullptr, nullptr, status).data(), NULL, &status));
+                    StackUResourceBundle replacedAlias;
+                    ures_getByKey(languageAlias.getAlias(),
+                                AppendLSCVE(temp.clear(), getLanguage(), getScript(), getCountry(), nullptr, nullptr, status).data(),
+                                replacedAlias.getAlias(), &status);
                     temp.clear().appendInvariantChars(
                         UnicodeString(ures_getStringByKey(replacedAlias.getAlias(), "replacement", nullptr, &status)), status);
                     if (U_SUCCESS(status)) {
@@ -768,10 +770,10 @@ Locale& Locale::init(const char* localeID, UBool canonicalize)
                 // ex: Map "zh_CN" to "zh_Hans_CN"
                 if (getCountry() != nullptr && getCountry()[0] != '\0') {
                     status = U_ZERO_ERROR;
-                    LocalUResourceBundlePointer replacedAlias(
-                        ures_getByKey(languageAlias.getAlias(),
-                                      AppendLSCVE(temp.clear(), getLanguage(), nullptr, getCountry(),
-                                                  nullptr, nullptr, status).data(), NULL, &status));
+                    StackUResourceBundle replacedAlias;
+                    ures_getByKey(languageAlias.getAlias(),
+                                  AppendLSCVE(temp.clear(), getLanguage(), nullptr, getCountry(), nullptr, nullptr, status).data(),
+                                  replacedAlias.getAlias(), &status);
                     temp.clear().appendInvariantChars(
                         UnicodeString(ures_getStringByKey(replacedAlias.getAlias(), "replacement", nullptr, &status)), status);
                     if (U_SUCCESS(status)) {
@@ -788,7 +790,8 @@ Locale& Locale::init(const char* localeID, UBool canonicalize)
                 // ex: Map "no" to "nb"
                 {
                     status = U_ZERO_ERROR;
-                    LocalUResourceBundlePointer replaceLanguageAlias(ures_getByKey(languageAlias.getAlias(), getLanguage(), NULL, &status));
+                    StackUResourceBundle replaceLanguageAlias;
+                    ures_getByKey(languageAlias.getAlias(), getLanguage(), replaceLanguageAlias.getAlias(), &status);
                     temp.clear().appendInvariantChars(
                         UnicodeString(ures_getStringByKey(replaceLanguageAlias.getAlias(), "replacement", nullptr, &status)), status);
                     if (U_SUCCESS(status)) {
@@ -821,8 +824,10 @@ Locale& Locale::init(const char* localeID, UBool canonicalize)
                     //     }
                     //   }
                     // }
-                    LocalUResourceBundlePointer territoryAlias(ures_getByKey(metadataAlias.getAlias(), "territory", NULL, &status));
-                    LocalUResourceBundlePointer countryAlias(ures_getByKey(territoryAlias.getAlias(), getCountry(), NULL, &status));
+                    StackUResourceBundle territoryAlias;
+                    ures_getByKey(metadataAlias.getAlias(), "territory", territoryAlias.getAlias(), &status);
+                    StackUResourceBundle countryAlias;
+                    ures_getByKey(territoryAlias.getAlias(), getCountry(), countryAlias.getAlias(), &status);
                     UnicodeString replacements(
                         ures_getStringByKey(countryAlias.getAlias(), "replacement", nullptr, &status));
                     if (U_SUCCESS(status)) {

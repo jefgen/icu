@@ -1475,9 +1475,9 @@ U_CAPI int32_t U_EXPORT2 ures_getSize(const UResourceBundle *resB) {
 static const UChar* ures_getStringWithAlias(const UResourceBundle *resB, Resource r, int32_t sIndex, int32_t *len, UErrorCode *status) {
   if(RES_GET_TYPE(r) == URES_ALIAS) {
     const UChar* result = 0;
-    UResourceBundle *tempRes = ures_getByIndex(resB, sIndex, NULL, status);
-    result = ures_getString(tempRes, len, status);
-    ures_close(tempRes);
+    StackUResourceBundle tempRes;
+    ures_getByIndex(resB, sIndex, tempRes.getAlias(), status);
+    result = ures_getString(tempRes.getAlias(), len, status);
     return result;
   } else {
     return res_getString({resB, sIndex}, &(resB->fResData), r, len); 
@@ -1713,7 +1713,7 @@ ures_getUTF8StringByIndex(const UResourceBundle *resB,
 U_CAPI UResourceBundle* U_EXPORT2
 ures_findResource(const char* path, UResourceBundle *fillIn, UErrorCode *status) 
 {
-  UResourceBundle *first = NULL; 
+  StackUResourceBundle first;
   UResourceBundle *result = fillIn;
   char *packageName = NULL;
   char *pathToResource = NULL, *save = NULL;
@@ -1751,15 +1751,14 @@ ures_findResource(const char* path, UResourceBundle *fillIn, UErrorCode *status)
     *localeEnd = 0;
   }
 
-  first = ures_open(packageName, locale, status);
+  ures_openFillIn(first.getAlias(), packageName, locale, status);
 
   if(U_SUCCESS(*status)) {
     if(localeEnd) {
-      result = ures_findSubResource(first, localeEnd+1, fillIn, status);
+      result = ures_findSubResource(first.getAlias(), localeEnd+1, fillIn, status);
     } else {
-      result = ures_copyResb(fillIn, first, status);
+      result = ures_copyResb(fillIn, first.getAlias(), status);
     }
-    ures_close(first);
   }
   uprv_free(save);
   return result;
@@ -2388,8 +2387,7 @@ ures_countArrayItems(const UResourceBundle* resourceBundle,
                   const char* resourceKey,
                   UErrorCode* status)
 {
-    UResourceBundle resData;
-    ures_initStackObject(&resData);
+    StackUResourceBundle resData;
     if (status==NULL || U_FAILURE(*status)) {
         return 0;
     }
@@ -2397,15 +2395,13 @@ ures_countArrayItems(const UResourceBundle* resourceBundle,
         *status = U_ILLEGAL_ARGUMENT_ERROR;
         return 0;
     }
-    ures_getByKey(resourceBundle, resourceKey, &resData, status);
+    ures_getByKey(resourceBundle, resourceKey, resData.getAlias(), status);
     
-    if(resData.fResData.data != NULL) {
-        int32_t result = res_countArrayItems(&resData.fResData, resData.fRes);
-        ures_close(&resData);
+    if(resData.ref().fResData.data != NULL) {
+        int32_t result = res_countArrayItems(&(resData.ref().fResData), resData.ref().fRes);
         return result;
     } else {
         *status = U_MISSING_RESOURCE_ERROR;
-        ures_close(&resData);
         return 0;
     }
 }

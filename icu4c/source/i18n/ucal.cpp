@@ -28,6 +28,7 @@
 #include "uenumimp.h"
 #include "ulist.h"
 #include "ulocimp.h"
+#include "uresimp.h"
 
 U_NAMESPACE_USE
 
@@ -700,12 +701,14 @@ ucal_getKeywordValuesForLocale(const char * /* key */, const char* locale, UBool
     (void)ulocimp_getRegionForSupplementalData(locale, TRUE, prefRegion, sizeof(prefRegion), status);
     
     // Read preferred calendar values from supplementalData calendarPreference
-    UResourceBundle *rb = ures_openDirect(NULL, "supplementalData", status);
-    ures_getByKey(rb, "calendarPreferenceData", rb, status);
-    UResourceBundle *order = ures_getByKey(rb, prefRegion, NULL, status);
-    if (*status == U_MISSING_RESOURCE_ERROR && rb != NULL) {
+    StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, "supplementalData", status);
+    ures_getByKey(rb.getAlias(), "calendarPreferenceData", rb.getAlias(), status);
+    StackUResourceBundle order;
+    ures_getByKey(rb.getAlias(), prefRegion, order.getAlias(), status);
+    if (*status == U_MISSING_RESOURCE_ERROR && rb.getAlias() != NULL) {
         *status = U_ZERO_ERROR;
-        order = ures_getByKey(rb, "001", NULL, status);
+        ures_getByKey(rb.getAlias(), "001", order.getAlias(), status);
     }
 
     // Create a list of calendar type strings
@@ -713,9 +716,9 @@ ucal_getKeywordValuesForLocale(const char * /* key */, const char* locale, UBool
     if (U_SUCCESS(*status)) {
         values = ulist_createEmptyList(status);
         if (U_SUCCESS(*status)) {
-            for (int i = 0; i < ures_getSize(order); i++) {
+            for (int i = 0; i < ures_getSize(order.getAlias()); i++) {
                 int32_t len;
-                const UChar *type = ures_getStringByIndex(order, i, &len, status);
+                const UChar *type = ures_getStringByIndex(order.getAlias(), i, &len, status);
                 char *caltype = (char*)uprv_malloc(len + 1);
                 if (caltype == NULL) {
                     *status = U_MEMORY_ALLOCATION_ERROR;
@@ -747,10 +750,7 @@ ucal_getKeywordValuesForLocale(const char * /* key */, const char* locale, UBool
             }
         }
     }
-
-    ures_close(order);
-    ures_close(rb);
-
+    
     if (U_FAILURE(*status) || values == NULL) {
         return NULL;
     }

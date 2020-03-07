@@ -2140,9 +2140,9 @@ U_CAPI const UChar* U_EXPORT2 ures_getStringByKey(const UResourceBundle *resB, c
                     case URES_ALIAS:
                       {
                         const UChar* result = 0;
-                        UResourceBundle *tempRes = ures_getByKey(resB, inKey, NULL, status);
-                        result = ures_getString(tempRes, len, status);
-                        ures_close(tempRes);
+                        StackUResourceBundle tempRes;
+                        ures_getByKey(resB, inKey, tempRes.getAlias(), status);
+                        result = ures_getString(tempRes.getAlias(), len, status);
                         return result;
                       }
                     default:
@@ -2162,9 +2162,9 @@ U_CAPI const UChar* U_EXPORT2 ures_getStringByKey(const UResourceBundle *resB, c
             case URES_ALIAS:
               {
                 const UChar* result = 0;
-                UResourceBundle *tempRes = ures_getByKey(resB, inKey, NULL, status);
-                result = ures_getString(tempRes, len, status);
-                ures_close(tempRes);
+                StackUResourceBundle tempRes;
+                ures_getByKey(resB, inKey, tempRes.getAlias(), status);
+                result = ures_getString(tempRes.getAlias(), len, status);
                 return result;
               }
             default:

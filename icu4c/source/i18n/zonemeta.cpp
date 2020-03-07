@@ -286,10 +286,12 @@ ZoneMeta::getCanonicalCLDRID(const UnicodeString &tzid, UErrorCode& status) {
         }
     }
 
-    UResourceBundle *top = ures_openDirect(NULL, gKeyTypeData, &tmpStatus);
-    UResourceBundle *rb = ures_getByKey(top, gTypeMapTag, NULL, &tmpStatus);
-    ures_getByKey(rb, gTimezoneTag, rb, &tmpStatus);
-    ures_getByKey(rb, id, rb, &tmpStatus);
+    StackUResourceBundle top;
+    ures_openDirectFillIn(top.getAlias(), NULL, gKeyTypeData, &tmpStatus);
+    StackUResourceBundle rb;
+    ures_getByKey(top.getAlias(), gTypeMapTag, rb.getAlias(), &tmpStatus);
+    ures_getByKey(rb.getAlias(), gTimezoneTag, rb.getAlias(), &tmpStatus);
+    ures_getByKey(rb.getAlias(), id, rb.getAlias(), &tmpStatus);
     if (U_SUCCESS(tmpStatus)) {
         // type entry (canonical) found
         // the input is the canonical ID. resolve to const UChar*
@@ -300,9 +302,9 @@ ZoneMeta::getCanonicalCLDRID(const UnicodeString &tzid, UErrorCode& status) {
     if (canonicalID == NULL) {
         // If a map element not found, then look for an alias
         tmpStatus = U_ZERO_ERROR;
-        ures_getByKey(top, gTypeAliasTag, rb, &tmpStatus);
-        ures_getByKey(rb, gTimezoneTag, rb, &tmpStatus);
-        const UChar *canonical = ures_getStringByKey(rb,id,NULL,&tmpStatus);
+        ures_getByKey(top.getAlias(), gTypeAliasTag, rb.getAlias(), &tmpStatus);
+        ures_getByKey(rb.getAlias(), gTimezoneTag, rb.getAlias(), &tmpStatus);
+        const UChar *canonical = ures_getStringByKey(rb.getAlias(), id, NULL, &tmpStatus);
         if (U_SUCCESS(tmpStatus)) {
             // canonical map found
             canonicalID = canonical;
@@ -330,7 +332,7 @@ ZoneMeta::getCanonicalCLDRID(const UnicodeString &tzid, UErrorCode& status) {
                 // rb still points to the alias table, so we don't have to go looking
                 // for it.
                 tmpStatus = U_ZERO_ERROR;
-                canonical = ures_getStringByKey(rb,id,NULL,&tmpStatus);
+                canonical = ures_getStringByKey(rb.getAlias(), id, NULL, &tmpStatus);
                 if (U_SUCCESS(tmpStatus)) {
                     // canonical map for the dereferenced ID found
                     canonicalID = canonical;
@@ -341,8 +343,6 @@ ZoneMeta::getCanonicalCLDRID(const UnicodeString &tzid, UErrorCode& status) {
             }
         }
     }
-    ures_close(rb);
-    ures_close(top);
 
     if (U_SUCCESS(status)) {
         U_ASSERT(canonicalID != NULL);  // canocanilD must be non-NULL here
@@ -500,9 +500,10 @@ ZoneMeta::getCanonicalCountry(const UnicodeString &tzid, UnicodeString &country,
                 u_UCharsToChars(region, regionBuf, 2);
             }
 
-            UResourceBundle *rb = ures_openDirect(NULL, gMetaZones, &status);
-            ures_getByKey(rb, gPrimaryZonesTag, rb, &status);
-            const UChar *primaryZone = ures_getStringByKey(rb, regionBuf, &idLen, &status);
+            StackUResourceBundle rb; 
+            ures_openDirectFillIn(rb.getAlias(), NULL, gMetaZones, &status);
+            ures_getByKey(rb.getAlias(), gPrimaryZonesTag, rb.getAlias(), &status);
+            const UChar *primaryZone = ures_getStringByKey(rb.getAlias(), regionBuf, &idLen, &status);
             if (U_SUCCESS(status)) {
                 if (tzid.compare(primaryZone, idLen) == 0) {
                     *isPrimary = TRUE;
@@ -515,7 +516,6 @@ ZoneMeta::getCanonicalCountry(const UnicodeString &tzid, UnicodeString &country,
                     }
                 }
             }
-            ures_close(rb);
         }
     }
 
@@ -629,8 +629,9 @@ ZoneMeta::createMetazoneMappings(const UnicodeString &tzid) {
     UErrorCode status = U_ZERO_ERROR;
 
     UnicodeString canonicalID;
-    UResourceBundle *rb = ures_openDirect(NULL, gMetaZones, &status);
-    ures_getByKey(rb, gMetazoneInfo, rb, &status);
+    StackUResourceBundle rb; 
+    ures_openDirectFillIn(rb.getAlias(), NULL, gMetaZones, &status);
+    ures_getByKey(rb.getAlias(), gMetazoneInfo, rb.getAlias(), &status);
     getCanonicalCLDRID(tzid, canonicalID, status);
 
     if (U_SUCCESS(status)) {
@@ -647,20 +648,20 @@ ZoneMeta::createMetazoneMappings(const UnicodeString &tzid) {
             p++;
         }
 
-        ures_getByKey(rb, tzKey, rb, &status);
+        ures_getByKey(rb.getAlias(), tzKey, rb.getAlias(), &status);
 
         if (U_SUCCESS(status)) {
-            UResourceBundle *mz = NULL;
-            while (ures_hasNext(rb)) {
-                mz = ures_getNextResource(rb, mz, &status);
+            StackUResourceBundle mz;
+            while (ures_hasNext(rb.getAlias())) {
+                ures_getNextResource(rb.getAlias(), mz.getAlias(), &status);
 
-                const UChar *mz_name = ures_getStringByIndex(mz, 0, NULL, &status);
+                const UChar *mz_name = ures_getStringByIndex(mz.getAlias(), 0, NULL, &status);
                 const UChar *mz_from = gDefaultFrom;
                 const UChar *mz_to = gDefaultTo;
 
-                if (ures_getSize(mz) == 3) {
-                    mz_from = ures_getStringByIndex(mz, 1, NULL, &status);
-                    mz_to   = ures_getStringByIndex(mz, 2, NULL, &status);
+                if (ures_getSize(mz.getAlias()) == 3) {
+                    mz_from = ures_getStringByIndex(mz.getAlias(), 1, NULL, &status);
+                    mz_to   = ures_getStringByIndex(mz.getAlias(), 2, NULL, &status);
                 }
 
                 if(U_FAILURE(status)){
@@ -701,7 +702,6 @@ ZoneMeta::createMetazoneMappings(const UnicodeString &tzid) {
                     break;
                 }
             }
-            ures_close(mz);
             if (U_FAILURE(status)) {
                 if (mzMappings != NULL) {
                     delete mzMappings;
@@ -710,7 +710,6 @@ ZoneMeta::createMetazoneMappings(const UnicodeString &tzid) {
             }
         }
     }
-    ures_close(rb);
     return mzMappings;
 }
 
@@ -730,26 +729,26 @@ ZoneMeta::getZoneIdByMetazone(const UnicodeString &mzid, const UnicodeString &re
     keyLen = mzid.extract(0, mzid.length(), keyBuf, ZID_KEY_MAX + 1, US_INV);
     keyBuf[keyLen] = 0;
 
-    UResourceBundle *rb = ures_openDirect(NULL, gMetaZones, &status);
-    ures_getByKey(rb, gMapTimezonesTag, rb, &status);
-    ures_getByKey(rb, keyBuf, rb, &status);
+    StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, gMetaZones, &status);
+    ures_getByKey(rb.getAlias(), gMapTimezonesTag, rb.getAlias(), &status);
+    ures_getByKey(rb.getAlias(), keyBuf, rb.getAlias(), &status);
 
     if (U_SUCCESS(status)) {
         // check region mapping
         if (region.length() == 2 || region.length() == 3) {
             keyLen = region.extract(0, region.length(), keyBuf, ZID_KEY_MAX + 1, US_INV);
             keyBuf[keyLen] = 0;
-            tzid = ures_getStringByKey(rb, keyBuf, &tzidLen, &status);
+            tzid = ures_getStringByKey(rb.getAlias(), keyBuf, &tzidLen, &status);
             if (status == U_MISSING_RESOURCE_ERROR) {
                 status = U_ZERO_ERROR;
             }
         }
         if (U_SUCCESS(status) && tzid == NULL) {
             // try "001"
-            tzid = ures_getStringByKey(rb, gWorldTag, &tzidLen, &status);
+            tzid = ures_getStringByKey(rb.getAlias(), gWorldTag, &tzidLen, &status);
         }
     }
-    ures_close(rb);
 
     if (tzid == NULL) {
         result.setToBogus();
@@ -782,11 +781,13 @@ static void U_CALLCONV initAvailableMetaZoneIDs () {
     }
     gMetaZoneIDs->setDeleter(uprv_free);
 
-    UResourceBundle *rb = ures_openDirect(NULL, gMetaZones, &status);
-    UResourceBundle *bundle = ures_getByKey(rb, gMapTimezonesTag, NULL, &status);
+    StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, gMetaZones, &status);
+    StackUResourceBundle bundle;
+    ures_getByKey(rb.getAlias(), gMapTimezonesTag, bundle.getAlias(), &status);
     StackUResourceBundle res;
-    while (U_SUCCESS(status) && ures_hasNext(bundle)) {
-        ures_getNextResource(bundle, res.getAlias(), &status);
+    while (U_SUCCESS(status) && ures_hasNext(bundle.getAlias())) {
+        ures_getNextResource(bundle.getAlias(), res.getAlias(), &status);
         if (U_FAILURE(status)) {
             break;
         }
@@ -808,8 +809,6 @@ static void U_CALLCONV initAvailableMetaZoneIDs () {
             delete usMzID;
         }
     }
-    ures_close(bundle);
-    ures_close(rb);
 
     if (U_FAILURE(status)) {
         uhash_close(gMetaZoneIDTable);
@@ -928,11 +927,11 @@ ZoneMeta::getShortIDFromCanonical(const UChar* canonicalID) {
     }
 
     UErrorCode status = U_ZERO_ERROR;
-    UResourceBundle *rb = ures_openDirect(NULL, gKeyTypeData, &status);
-    ures_getByKey(rb, gTypeMapTag, rb, &status);
-    ures_getByKey(rb, gTimezoneTag, rb, &status);
-    shortID = ures_getStringByKey(rb, tzidKey, NULL, &status);
-    ures_close(rb);
+    StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, gKeyTypeData, &status);
+    ures_getByKey(rb.getAlias(), gTypeMapTag, rb.getAlias(), &status);
+    ures_getByKey(rb.getAlias(), gTimezoneTag, rb.getAlias(), &status);
+    shortID = ures_getStringByKey(rb.getAlias(), tzidKey, NULL, &status);
 
     return shortID;
 }

@@ -21,6 +21,7 @@
 #include "uvector.h"
 #include "gregoimp.h"
 #include "uassert.h"
+#include "uresimp.h"
 
 U_NAMESPACE_BEGIN
 
@@ -1082,15 +1083,14 @@ VTimeZone::createVTimeZoneByID(const UnicodeString& ID) {
 
     // Set ICU tzdata version
     UErrorCode status = U_ZERO_ERROR;
-    UResourceBundle *bundle = nullptr;
+    StackUResourceBundle bundle;
     const UChar* versionStr = nullptr;
     int32_t len = 0;
-    bundle = ures_openDirect(nullptr, "zoneinfo64", &status);
-    versionStr = ures_getStringByKey(bundle, "TZVersion", &len, &status);
+    ures_openDirectFillIn(bundle.getAlias(), nullptr, "zoneinfo64", &status);
+    versionStr = ures_getStringByKey(bundle.getAlias(), "TZVersion", &len, &status);
     if (U_SUCCESS(status)) {
         vtz->icutzver.setTo(versionStr, len);
     }
-    ures_close(bundle);
     return vtz;
 }
 
@@ -1113,15 +1113,14 @@ VTimeZone::createVTimeZoneFromBasicTimeZone(const BasicTimeZone& basic_time_zone
     vtz->tz->getID(vtz->olsonzid);
 
     // Set ICU tzdata version
-    UResourceBundle *bundle = nullptr;
+    StackUResourceBundle bundle;
     const UChar* versionStr = nullptr;
     int32_t len = 0;
-    bundle = ures_openDirect(nullptr, "zoneinfo64", &status);
-    versionStr = ures_getStringByKey(bundle, "TZVersion", &len, &status);
+    ures_openDirectFillIn(bundle.getAlias(), nullptr, "zoneinfo64", &status);
+    versionStr = ures_getStringByKey(bundle.getAlias(), "TZVersion", &len, &status);
     if (U_SUCCESS(status)) {
         vtz->icutzver.setTo(versionStr, len);
     }
-    ures_close(bundle);
     return vtz;
 }
 

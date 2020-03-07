@@ -33,6 +33,7 @@
 #include "cstring.h"
 #include "ulocimp.h"
 #include "ustr_imp.h"
+#include "uresimp.h"
 
 /**
  * These are the canonical strings for unknown languages, scripts and regions.
@@ -60,7 +61,8 @@ findLikelySubtags(const char* localeID,
         int32_t resLen = 0;
         const UChar* s = NULL;
         UErrorCode tmpErr = U_ZERO_ERROR;
-        icu::LocalUResourceBundlePointer subtags(ures_openDirect(NULL, "likelySubtags", &tmpErr));
+        icu::StackUResourceBundle subtags;
+        ures_openDirectFillIn(subtags.getAlias(), NULL, "likelySubtags", &tmpErr);
         if (U_SUCCESS(tmpErr)) {
             icu::CharString und;
             if (localeID != NULL) {

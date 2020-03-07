@@ -492,7 +492,8 @@ LocaleDisplayNamesImpl::initialize(void) {
     // Also check whether we will need a break iterator (depends on the data)
     UBool needBrkIter = FALSE;
     if (capitalizationContext == UDISPCTX_CAPITALIZATION_FOR_UI_LIST_OR_MENU || capitalizationContext == UDISPCTX_CAPITALIZATION_FOR_STANDALONE) {
-        LocalUResourceBundlePointer resource(ures_open(NULL, locale.getName(), &status));
+        StackUResourceBundle resource;
+        ures_openFillIn(resource.getAlias(), NULL, locale.getName(), &status);
         if (U_FAILURE(status)) { return; }
         CapitalizationContextSink sink(*this);
         ures_getAllItemsWithFallback(resource.getAlias(), "contextTransforms", sink, status);

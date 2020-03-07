@@ -227,13 +227,13 @@ DictionaryMatcher *
 ICULanguageBreakFactory::loadDictionaryMatcherFor(UScriptCode script) { 
     UErrorCode status = U_ZERO_ERROR;
     // open root from brkitr tree.
-    UResourceBundle *b = ures_open(U_ICUDATA_BRKITR, "", &status);
-    b = ures_getByKeyWithFallback(b, "dictionaries", b, &status);
+    StackUResourceBundle b;
+    ures_openFillIn(b.getAlias(), U_ICUDATA_BRKITR, "", &status);
+    ures_getByKeyWithFallback(b.getAlias(), "dictionaries", b.getAlias(), &status);
     int32_t dictnlength = 0;
     const UChar *dictfname =
-        ures_getStringByKeyWithFallback(b, uscript_getShortName(script), &dictnlength, &status);
+        ures_getStringByKeyWithFallback(b.getAlias(), uscript_getShortName(script), &dictnlength, &status);
     if (U_FAILURE(status)) {
-        ures_close(b);
         return NULL;
     }
     CharString dictnbuf;
@@ -245,7 +245,6 @@ ICULanguageBreakFactory::loadDictionaryMatcherFor(UScriptCode script) {
         dictnlength = len;
     }
     dictnbuf.appendInvariantChars(UnicodeString(FALSE, dictfname, dictnlength), status);
-    ures_close(b);
 
     UDataMemory *file = udata_open(U_ICUDATA_BRKITR, ext.data(), dictnbuf.data(), &status);
     if (U_SUCCESS(status)) {

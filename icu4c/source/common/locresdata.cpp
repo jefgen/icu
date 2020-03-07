@@ -58,7 +58,8 @@ uloc_getTableStringWithFallback(const char *path, const char *locale,
      * this falls back through the locale's chain to root
      */
     errorCode=U_ZERO_ERROR;
-    icu::LocalUResourceBundlePointer rb(ures_open(path, locale, &errorCode));
+    icu::StackUResourceBundle rb;
+    ures_openFillIn(rb.getAlias(), path, locale, &errorCode);
 
     if(U_FAILURE(errorCode)) {
         /* total failure, not even root could be opened */
@@ -134,7 +135,7 @@ uloc_getTableStringWithFallback(const char *path, const char *locale,
                 *pErrorCode = U_INTERNAL_PROGRAM_ERROR;
                 break;
             }
-            rb.adoptInstead(ures_open(path, explicitFallbackName, &errorCode));
+            ures_openFillIn(rb.getAlias(), path, explicitFallbackName, &errorCode);
             if(U_FAILURE(errorCode)){
                 *pErrorCode = errorCode;
                 break;

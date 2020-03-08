@@ -778,7 +778,8 @@ DateIntervalFormat::initializePattern(UErrorCode& status) {
         // with the time interval.
         // The date/time pattern ( such as {0} {1} ) is saved in
         // calendar, that is why need to get the CalendarData here.
-        LocalUResourceBundlePointer dateTimePatternsRes(ures_open(nullptr, locale.getBaseName(), &status));
+        StackUResourceBundle dateTimePatternsRes;
+        ures_openFillIn(dateTimePatternsRes.getAlias(), nullptr, locale.getBaseName(), &status);
         ures_getByKey(dateTimePatternsRes.getAlias(), gCalendarTag,
                       dateTimePatternsRes.getAlias(), &status);
         ures_getByKeyWithFallback(dateTimePatternsRes.getAlias(), gGregorianTag,

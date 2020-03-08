@@ -410,41 +410,35 @@ DateIntervalInfo::initializeData(const Locale& locale, UErrorCode& status)
     status = U_ZERO_ERROR;
 
     // Instantiate the resource bundles
-    UResourceBundle *rb, *calBundle;
-    rb = ures_open(nullptr, locName, &status);
+    StackUResourceBundle rb, calBundle;
+    ures_openFillIn(rb.getAlias(), nullptr, locName, &status);
     if (U_FAILURE(status)) {
         return;
     }
-    calBundle = ures_getByKeyWithFallback(rb, gCalendarTag, nullptr, &status);
-
+    ures_getByKeyWithFallback(rb.getAlias(), gCalendarTag, calBundle.getAlias(), &status);
 
     if (U_SUCCESS(status)) {
-        UResourceBundle *calTypeBundle, *itvDtPtnResource;
+        StackUResourceBundle calTypeBundle, itvDtPtnResource;
 
         // Get the fallback pattern
         const UChar* resStr = nullptr;
         int32_t resStrLen = 0;
-        calTypeBundle = ures_getByKeyWithFallback(calBundle, calendarTypeToUse, nullptr, &status);
-        itvDtPtnResource = ures_getByKeyWithFallback(calTypeBundle,
-                                                     gIntervalDateTimePatternTag, nullptr, &status);
+        ures_getByKeyWithFallback(calBundle.getAlias(), calendarTypeToUse, calTypeBundle.getAlias(), &status);
+        ures_getByKeyWithFallback(calTypeBundle.getAlias(), gIntervalDateTimePatternTag, itvDtPtnResource.getAlias(), &status);
+
         // TODO(ICU-20400): After the fixing, we should find the "fallback" from
         // the rb directly by the path "calendar/${calendar}/intervalFormats/fallback".
         if ( U_SUCCESS(status) ) {
-            resStr = ures_getStringByKeyWithFallback(itvDtPtnResource, gFallbackPatternTag,
-                                                     &resStrLen, &status);
+            resStr = ures_getStringByKeyWithFallback(itvDtPtnResource.getAlias(), gFallbackPatternTag, &resStrLen, &status);
             if ( U_FAILURE(status) ) {
                 // Try to find "fallback" from "generic" to work around the bug in
                 // ures_getByKeyWithFallback
                 UErrorCode localStatus = U_ZERO_ERROR;
-                UResourceBundle *genericCalBundle =
-                    ures_getByKeyWithFallback(calBundle, gGenericTag, nullptr, &localStatus);
-                UResourceBundle *genericItvDtPtnResource =
-                    ures_getByKeyWithFallback(
-                        genericCalBundle, gIntervalDateTimePatternTag, nullptr, &localStatus);
-                resStr = ures_getStringByKeyWithFallback(
-                    genericItvDtPtnResource, gFallbackPatternTag, &resStrLen, &localStatus);
-                ures_close(genericItvDtPtnResource);
-                ures_close(genericCalBundle);
+                StackUResourceBundle genericCalBundle;
+                ures_getByKeyWithFallback(calBundle.getAlias(), gGenericTag, genericCalBundle.getAlias(), &localStatus);
+                StackUResourceBundle genericItvDtPtnResource;
+                ures_getByKeyWithFallback(genericCalBundle.getAlias(), gIntervalDateTimePatternTag, genericItvDtPtnResource.getAlias(), &localStatus);
+                resStr = ures_getStringByKeyWithFallback(genericItvDtPtnResource.getAlias(), gFallbackPatternTag, &resStrLen, &localStatus);
                 if ( U_SUCCESS(localStatus) ) {
                     status = U_USING_FALLBACK_WARNING;;
                 }
@@ -455,9 +449,6 @@ DateIntervalInfo::initializeData(const Locale& locale, UErrorCode& status)
             UnicodeString pattern = UnicodeString(TRUE, resStr, resStrLen);
             setFallbackIntervalPattern(pattern, status);
         }
-        ures_close(itvDtPtnResource);
-        ures_close(calTypeBundle);
-
 
         // Instantiate the sink
         DateIntervalSink sink(*this, calendarTypeToUse);
@@ -488,14 +479,10 @@ DateIntervalInfo::initializeData(const Locale& locale, UErrorCode& status)
                 sink.resetNextCalendarType();
 
                 // Get all resources for this calendar type
-                ures_getAllItemsWithFallback(calBundle, calType, sink, status);
+                ures_getAllItemsWithFallback(calBundle.getAlias(), calType, sink, status);
             }
         }
     }
-
-    // Close the opened resource bundles
-    ures_close(calBundle);
-    ures_close(rb);
 }
 
 void

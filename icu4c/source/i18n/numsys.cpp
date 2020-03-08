@@ -291,9 +291,9 @@ U_CFUNC void initNumsysNames(UErrorCode &status) {
     }
 
     UErrorCode rbstatus = U_ZERO_ERROR;
-    UResourceBundle *numberingSystemsInfo = ures_openDirect(nullptr, "numberingSystems", &rbstatus);
-    numberingSystemsInfo =
-            ures_getByKey(numberingSystemsInfo, "numberingSystems", numberingSystemsInfo, &rbstatus);
+    StackUResourceBundle numberingSystemsInfo;
+    ures_openDirectFillIn(numberingSystemsInfo.getAlias(), nullptr, "numberingSystems", &rbstatus);
+    ures_getByKey(numberingSystemsInfo.getAlias(), "numberingSystems", numberingSystemsInfo.getAlias(), &rbstatus);
     if (U_FAILURE(rbstatus)) {
         // Don't stomp on the catastrophic failure of OOM.
         if (rbstatus == U_MEMORY_ALLOCATION_ERROR) {
@@ -301,12 +301,12 @@ U_CFUNC void initNumsysNames(UErrorCode &status) {
         } else {
             status = U_MISSING_RESOURCE_ERROR;
         }
-        ures_close(numberingSystemsInfo);
         return;
     }
 
-    while ( ures_hasNext(numberingSystemsInfo) && U_SUCCESS(status) ) {
-        LocalUResourceBundlePointer nsCurrent(ures_getNextResource(numberingSystemsInfo, nullptr, &rbstatus));
+    StackUResourceBundle nsCurrent;
+    while ( ures_hasNext(numberingSystemsInfo.getAlias()) && U_SUCCESS(status) ) {
+        ures_getNextResource(numberingSystemsInfo.getAlias(), nsCurrent.getAlias(), &rbstatus);
         if (rbstatus == U_MEMORY_ALLOCATION_ERROR) {
             status = rbstatus; // we want to report OOM failure back to the caller.
             break;
@@ -321,7 +321,6 @@ U_CFUNC void initNumsysNames(UErrorCode &status) {
         }
     }
 
-    ures_close(numberingSystemsInfo);
     if (U_SUCCESS(status)) {
         gNumsysNames = numsysNames.orphan();
     }

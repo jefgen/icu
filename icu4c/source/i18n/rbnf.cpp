@@ -842,34 +842,30 @@ RuleBasedNumberFormat::RuleBasedNumberFormat(URBNFRuleSetTag tag, const Locale& 
     // TODO: read localization info from resource
     LocalizationInfo* locinfo = NULL;
 
-    UResourceBundle* nfrb = ures_open(U_ICUDATA_RBNF, locale.getName(), &status);
+    StackUResourceBundle nfrb;
+    ures_openFillIn(nfrb.getAlias(), U_ICUDATA_RBNF, locale.getName(), &status);
     if (U_SUCCESS(status)) {
-        setLocaleIDs(ures_getLocaleByType(nfrb, ULOC_VALID_LOCALE, &status),
-                     ures_getLocaleByType(nfrb, ULOC_ACTUAL_LOCALE, &status));
+        setLocaleIDs(ures_getLocaleByType(nfrb.getAlias(), ULOC_VALID_LOCALE, &status),
+                     ures_getLocaleByType(nfrb.getAlias(), ULOC_ACTUAL_LOCALE, &status));
 
-        UResourceBundle* rbnfRules = ures_getByKeyWithFallback(nfrb, rules_tag, NULL, &status);
+        StackUResourceBundle rbnfRules;
+        ures_getByKeyWithFallback(nfrb.getAlias(), rules_tag, rbnfRules.getAlias(), &status);
+
+        StackUResourceBundle ruleSets;
+        ures_getByKeyWithFallback(rbnfRules.getAlias(), fmt_tag, ruleSets.getAlias(), &status);
+
         if (U_FAILURE(status)) {
-            ures_close(nfrb);
-        }
-        UResourceBundle* ruleSets = ures_getByKeyWithFallback(rbnfRules, fmt_tag, NULL, &status);
-        if (U_FAILURE(status)) {
-            ures_close(rbnfRules);
-            ures_close(nfrb);
             return;
         }
 
         UnicodeString desc;
-        while (ures_hasNext(ruleSets)) {
-           desc.append(ures_getNextUnicodeString(ruleSets,NULL,&status));
+        while (ures_hasNext(ruleSets.getAlias())) {
+            desc.append(ures_getNextUnicodeString(ruleSets.getAlias(), NULL, &status));
         }
         UParseError perror;
 
         init(desc, locinfo, perror, status);
-
-        ures_close(ruleSets);
-        ures_close(rbnfRules);
     }
-    ures_close(nfrb);
 }
 
 RuleBasedNumberFormat::RuleBasedNumberFormat(const RuleBasedNumberFormat& rhs)
@@ -1684,18 +1680,18 @@ RuleBasedNumberFormat::initCapitalizationContextInfo(const Locale& thelocale)
 #if !UCONFIG_NO_BREAK_ITERATION
     const char * localeID = (thelocale != NULL)? thelocale.getBaseName(): NULL;
     UErrorCode status = U_ZERO_ERROR;
-    UResourceBundle *rb = ures_open(NULL, localeID, &status);
-    rb = ures_getByKeyWithFallback(rb, "contextTransforms", rb, &status);
-    rb = ures_getByKeyWithFallback(rb, "number-spellout", rb, &status);
-    if (U_SUCCESS(status) && rb != NULL) {
+    StackUResourceBundle rb;
+    ures_openFillIn(rb.getAlias(), NULL, localeID, &status);
+    ures_getByKeyWithFallback(rb.getAlias(), "contextTransforms", rb.getAlias(), &status);
+    ures_getByKeyWithFallback(rb.getAlias(), "number-spellout", rb.getAlias(), &status);
+    if (U_SUCCESS(status) && rb.getAlias() != NULL) {
         int32_t len = 0;
-        const int32_t * intVector = ures_getIntVector(rb, &len, &status);
+        const int32_t *intVector = ures_getIntVector(rb.getAlias(), &len, &status);
         if (U_SUCCESS(status) && intVector != NULL && len >= 2) {
             capitalizationForUIListMenu = static_cast<UBool>(intVector[0]);
             capitalizationForStandAlone = static_cast<UBool>(intVector[1]);
         }
     }
-    ures_close(rb);
 #endif
 }
 

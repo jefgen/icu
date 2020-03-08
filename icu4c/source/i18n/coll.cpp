@@ -225,12 +225,12 @@ initAvailableLocaleList(UErrorCode &status) {
     U_ASSERT(availableLocaleListCount == 0);
     U_ASSERT(availableLocaleList == NULL);
     // for now, there is a hardcoded list, so just walk through that list and set it up.
-    UResourceBundle *index = NULL;
+    StackUResourceBundle index;
     StackUResourceBundle installed;
     int32_t i = 0;
     
-    index = ures_openDirect(U_ICUDATA_COLL, "res_index", &status);
-    ures_getByKey(index, "InstalledLocales", installed.getAlias(), &status);
+    ures_openDirectFillIn(index.getAlias(), U_ICUDATA_COLL, "res_index", &status);
+    ures_getByKey(index.getAlias(), "InstalledLocales", installed.getAlias(), &status);
 
     if(U_SUCCESS(status)) {
         availableLocaleListCount = ures_getSize(installed.getAlias());
@@ -246,7 +246,6 @@ initAvailableLocaleList(UErrorCode &status) {
         }
         U_ASSERT(availableLocaleListCount == i);
     }
-    ures_close(index);
     ucln_i18n_registerCleanup(UCLN_I18N_COLLATOR, collator_cleanup);
 }
 

@@ -31,13 +31,14 @@
 #include "ustr_imp.h"
 #include "ucnv_imp.h"
 #include "putilimp.h"
+#include "uresimp.h"
 
 U_CAPI int32_t U_EXPORT2
 ucnv_getDisplayName(const UConverter *cnv,
                     const char *displayLocale,
                     UChar *displayName, int32_t displayNameCapacity,
                     UErrorCode *pErrorCode) {
-    UResourceBundle *rb;
+    icu::StackUResourceBundle rb;
     const UChar *name;
     int32_t length;
     UErrorCode localStatus = U_ZERO_ERROR;
@@ -53,14 +54,13 @@ ucnv_getDisplayName(const UConverter *cnv,
     }
 
     /* open the resource bundle and get the display name string */
-    rb=ures_open(NULL, displayLocale, pErrorCode);
+    ures_openFillIn(rb.getAlias(), NULL, displayLocale, pErrorCode);
     if(U_FAILURE(*pErrorCode)) {
         return 0;
     }
 
     /* use the internal name as the key */
-    name=ures_getStringByKey(rb, cnv->sharedData->staticData->name, &length, &localStatus);
-    ures_close(rb);
+    name = ures_getStringByKey(rb.getAlias(), cnv->sharedData->staticData->name, &length, &localStatus);
 
     if(U_SUCCESS(localStatus)) {
         /* copy the string */

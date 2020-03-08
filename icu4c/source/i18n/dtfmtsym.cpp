@@ -2102,15 +2102,18 @@ DateFormatSymbols::initializeData(const Locale& locale, const char *type, UError
 
     if (U_FAILURE(status)) return;
 
-    // Create a CalendarDataSink to process this data and the resouce bundles
+    // Create a CalendarDataSink to process this data and the resource bundles
     CalendarDataSink calendarSink(status);
-    UResourceBundle *rb = ures_open(NULL, locale.getBaseName(), &status);
-    UResourceBundle *cb = ures_getByKey(rb, gCalendarTag, NULL, &status);
+    StackUResourceBundle rb;
+    ures_openFillIn(rb.getAlias(), NULL, locale.getBaseName(), &status);
+    StackUResourceBundle cb;
+    ures_getByKey(rb.getAlias(), gCalendarTag, cb.getAlias(), &status);
 
     if (U_FAILURE(status)) return;
 
     // Iterate over the resource bundle data following the fallbacks through different calendar types
     UnicodeString calendarType((type != NULL && *type != '\0')? type : gGregorianTag, -1, US_INV);
+    StackUResourceBundle ctb;
     while (!calendarType.isBogus()) {
         CharString calendarTypeBuffer;
         calendarTypeBuffer.appendInvariantChars(calendarType, status);
@@ -2119,9 +2122,8 @@ DateFormatSymbols::initializeData(const Locale& locale, const char *type, UError
 
         // Enumerate this calendar type. If the calendar is not found fallback to gregorian
         UErrorCode oldStatus = status;
-        UResourceBundle *ctb = ures_getByKeyWithFallback(cb, calendarTypeCArray, NULL, &status);
+        ures_getByKeyWithFallback(cb.getAlias(), calendarTypeCArray, ctb.getAlias(), &status);
         if (status == U_MISSING_RESOURCE_ERROR) {
-            ures_close(ctb);
             if (uprv_strcmp(calendarTypeCArray, gGregorianTag) != 0) {
                 calendarType.setTo(FALSE, kGregorianTagUChar, UPRV_LENGTHOF(kGregorianTagUChar));
                 calendarSink.visitAllResources();
@@ -2132,8 +2134,7 @@ DateFormatSymbols::initializeData(const Locale& locale, const char *type, UError
         }
 
         calendarSink.preEnumerate(calendarType);
-        ures_getAllItemsWithFallback(ctb, "", calendarSink, status);
-        ures_close(ctb);
+        ures_getAllItemsWithFallback(ctb.getAlias(), "", calendarSink, status);
         if (U_FAILURE(status)) break;
 
         // Stop loading when gregorian was loaded
@@ -2204,15 +2205,17 @@ DateFormatSymbols::initializeData(const Locale& locale, const char *type, UError
 
     // Load context transforms and capitalization
     tempStatus = U_ZERO_ERROR;
-    UResourceBundle *localeBundle = ures_open(NULL, locale.getName(), &tempStatus);
+    StackUResourceBundle localeBundle;
+    ures_openFillIn(localeBundle.getAlias(), NULL, locale.getName(), &tempStatus);
     if (U_SUCCESS(tempStatus)) {
-        UResourceBundle *contextTransforms = ures_getByKeyWithFallback(localeBundle, gContextTransformsTag, NULL, &tempStatus);
+        StackUResourceBundle contextTransforms;
+        ures_getByKeyWithFallback(localeBundle.getAlias(), gContextTransformsTag, contextTransforms.getAlias(), &tempStatus);
         if (U_SUCCESS(tempStatus)) {
-            UResourceBundle *contextTransformUsage;
-            while ( (contextTransformUsage = ures_getNextResource(contextTransforms, NULL, &tempStatus)) != NULL ) {
-                const int32_t * intVector = ures_getIntVector(contextTransformUsage, &len, &status);
+            StackUResourceBundle contextTransformUsage;
+            while ( ures_getNextResource(contextTransforms.getAlias(), contextTransformUsage.getAlias(), &tempStatus) != NULL && U_SUCCESS(tempStatus) ) {
+                const int32_t *intVector = ures_getIntVector(contextTransformUsage.getAlias(), &len, &status);
                 if (U_SUCCESS(tempStatus) && intVector != NULL && len >= 2) {
-                    const char* usageType = ures_getKey(contextTransformUsage);
+                    const char *usageType = ures_getKey(contextTransformUsage.getAlias());
                     if (usageType != NULL) {
                         const ContextUsageTypeNameToEnumValue * typeMapPtr = contextUsageTypeMap;
                         int32_t compResult = 0;
@@ -2227,9 +2230,7 @@ DateFormatSymbols::initializeData(const Locale& locale, const char *type, UError
                     }
                 }
                 tempStatus = U_ZERO_ERROR;
-                ures_close(contextTransformUsage);
             }
-            ures_close(contextTransforms);
         }
 
         tempStatus = U_ZERO_ERROR;
@@ -2240,7 +2241,7 @@ DateFormatSymbols::initializeData(const Locale& locale, const char *type, UError
             // do nothing unless U_SUCCESS(tempStatus), so it's only necessary
             // to check for errors once after all calls are made.
             const LocalUResourceBundlePointer numberElementsData(ures_getByKeyWithFallback(
-                    localeBundle, gNumberElementsTag, NULL, &tempStatus));
+                localeBundle.getAlias(), gNumberElementsTag, NULL, &tempStatus));
             const LocalUResourceBundlePointer nsNameData(ures_getByKeyWithFallback(
                     numberElementsData.getAlias(), numberingSystem->getName(), NULL, &tempStatus));
             const LocalUResourceBundlePointer symbolsData(ures_getByKeyWithFallback(
@@ -2251,8 +2252,6 @@ DateFormatSymbols::initializeData(const Locale& locale, const char *type, UError
                 fTimeSeparator.setToBogus();
             }
         }
-
-        ures_close(localeBundle);
     }
 
     if (fTimeSeparator.isBogus()) {
@@ -2283,8 +2282,8 @@ DateFormatSymbols::initializeData(const Locale& locale, const char *type, UError
     // if we make it to here, the resource data is cool, and we can get everything out
     // of it that we need except for the time-zone and localized-pattern data, which
     // are stored in a separate file
-    locBased.setLocaleIDs(ures_getLocaleByType(cb, ULOC_VALID_LOCALE, &status),
-                          ures_getLocaleByType(cb, ULOC_ACTUAL_LOCALE, &status));
+    locBased.setLocaleIDs(ures_getLocaleByType(cb.getAlias(), ULOC_VALID_LOCALE, &status),
+                          ures_getLocaleByType(cb.getAlias(), ULOC_ACTUAL_LOCALE, &status));
 
     // Load eras
     initField(&fEras, fErasCount, calendarSink, buildResourcePath(path, gErasTag, gNamesAbbrTag, status), status);
@@ -2486,10 +2485,6 @@ DateFormatSymbols::initializeData(const Locale& locale, const char *type, UError
             fLocalPatternChars.setTo(TRUE, gPatternChars, PATTERN_CHARS_LEN);
         }
     }
-
-    // Close resources
-    ures_close(cb);
-    ures_close(rb);
 }
 
 Locale

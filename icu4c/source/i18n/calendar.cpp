@@ -298,28 +298,28 @@ static ECalType getCalendarTypeForLocale(const char *locid) {
     }
 
     // Read preferred calendar values from supplementalData calendarPreference
-    UResourceBundle *rb = ures_openDirect(NULL, "supplementalData", &status);
-    ures_getByKey(rb, "calendarPreferenceData", rb, &status);
-    UResourceBundle *order = ures_getByKey(rb, region, NULL, &status);
-    if (status == U_MISSING_RESOURCE_ERROR && rb != NULL) {
+    StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, "supplementalData", &status);
+    ures_getByKey(rb.getAlias(), "calendarPreferenceData", rb.getAlias(), &status);
+    StackUResourceBundle order;
+    ures_getByKey(rb.getAlias(), region, order.getAlias(), &status);
+
+    if (status == U_MISSING_RESOURCE_ERROR && rb.getAlias() != NULL) {
         status = U_ZERO_ERROR;
-        order = ures_getByKey(rb, "001", NULL, &status);
+        ures_getByKey(rb.getAlias(), "001", order.getAlias(), &status);
     }
 
     calTypeBuf[0] = 0;
-    if (U_SUCCESS(status) && order != NULL) {
+    if (U_SUCCESS(status) && order.getAlias() != NULL) {
         // the first calender type is the default for the region
         int32_t len = 0;
-        const UChar *uCalType = ures_getStringByIndex(order, 0, &len, &status);
+        const UChar *uCalType = ures_getStringByIndex(order.getAlias(), 0, &len, &status);
         if (len < (int32_t)sizeof(calTypeBuf)) {
             u_UCharsToChars(uCalType, calTypeBuf, len);
             *(calTypeBuf + len) = 0; // terminate;
             calType = getCalendarType(calTypeBuf);
         }
     }
-
-    ures_close(order);
-    ures_close(rb);
 
     if (calType == CALTYPE_UNKNOWN) {
         // final fallback
@@ -3822,7 +3822,8 @@ Calendar::setWeekData(const Locale& desiredLocale, const char *type, UErrorCode&
 
     // Get the monthNames resource bundle for the calendar 'type'. Fallback to gregorian if the resource is not
     // found.
-    LocalUResourceBundlePointer calData(ures_open(NULL, useLocale.getBaseName(), &status));
+    StackUResourceBundle calData;
+    ures_openFillIn(calData.getAlias(), NULL, useLocale.getBaseName(), &status);
     ures_getByKey(calData.getAlias(), gCalendar, calData.getAlias(), &status);
 
     LocalUResourceBundlePointer monthNames;
@@ -3853,19 +3854,21 @@ Calendar::setWeekData(const Locale& desiredLocale, const char *type, UErrorCode&
     (void)ulocimp_getRegionForSupplementalData(desiredLocale.getName(), TRUE, region, sizeof(region), &status);
 
     // Read week data values from supplementalData week data
-    UResourceBundle *rb = ures_openDirect(NULL, "supplementalData", &status);
-    ures_getByKey(rb, "weekData", rb, &status);
-    UResourceBundle *weekData = ures_getByKey(rb, region, NULL, &status);
-    if (status == U_MISSING_RESOURCE_ERROR && rb != NULL) {
+    StackUResourceBundle rb;
+    ures_openDirectFillIn(rb.getAlias(), NULL, "supplementalData", &status);
+    ures_getByKey(rb.getAlias(), "weekData", rb.getAlias(), &status);
+    StackUResourceBundle weekData;
+    ures_getByKey(rb.getAlias(), region, weekData.getAlias(), &status);
+    if (status == U_MISSING_RESOURCE_ERROR && rb.getAlias() != NULL) {
         status = U_ZERO_ERROR;
-        weekData = ures_getByKey(rb, "001", NULL, &status);
+        ures_getByKey(rb.getAlias(), "001", weekData.getAlias(), &status);
     }
 
     if (U_FAILURE(status)) {
         status = U_USING_FALLBACK_WARNING;
     } else {
         int32_t arrLen;
-        const int32_t *weekDataArr = ures_getIntVector(weekData,&arrLen,&status);
+        const int32_t *weekDataArr = ures_getIntVector(weekData.getAlias(), &arrLen, &status);
         if( U_SUCCESS(status) && arrLen == 6
                 && 1 <= weekDataArr[0] && weekDataArr[0] <= 7
                 && 1 <= weekDataArr[1] && weekDataArr[1] <= 7
@@ -3881,8 +3884,6 @@ Calendar::setWeekData(const Locale& desiredLocale, const char *type, UErrorCode&
             status = U_INVALID_FORMAT_ERROR;
         }
     }
-    ures_close(weekData);
-    ures_close(rb);
 }
 
 /**

@@ -1426,8 +1426,9 @@ SimpleDateFormat::subFormat(UnicodeString &appendTo,
     const NumberFormat *currentNumberFormat;
     DateFormatSymbols::ECapitalizationContextUsageType capContextUsageType = DateFormatSymbols::kCapContextUsageOther;
 
-    UBool isHebrewCalendar = (uprv_strcmp(cal.getType(),"hebrew") == 0);
-    UBool isChineseCalendar = (uprv_strcmp(cal.getType(),"chinese") == 0 || uprv_strcmp(cal.getType(),"dangi") == 0);
+    const char* const calType = cal.getType(); // store in local variable to save repeated calls to getType().
+    UBool isHebrewCalendar = (uprv_strcmp(calType,"hebrew") == 0);
+    UBool isChineseCalendar = (uprv_strcmp(calType, "chinese") == 0 || uprv_strcmp(calType, "dangi") == 0);
 
     // if the pattern character is unrecognized, signal an error and dump out
     if (patternCharIndex == UDAT_FIELD_COUNT)
@@ -2860,7 +2861,7 @@ int32_t SimpleDateFormat::matchString(const UnicodeString& text,
     if (bestMatch >= 0) {
         if (field < UCAL_FIELD_COUNT) {
             // Adjustment for Hebrew Calendar month Adar II
-            if (!strcmp(cal.getType(),"hebrew") && field==UCAL_MONTH && bestMatch==13) {
+            if (uprv_strcmp(cal.getType(),"hebrew")==0 && field==UCAL_MONTH && bestMatch==13) {
                 cal.set(field,6);
             } else {
                 if (field == UCAL_YEAR) {
@@ -2949,7 +2950,10 @@ int32_t SimpleDateFormat::subParse(const UnicodeString& text, int32_t& start, UC
     if (numericLeapMonthFormatter != NULL) {
         numericLeapMonthFormatter->setFormats((const Format **)&currentNumberFormat, 1);
     }
-    UBool isChineseCalendar = (uprv_strcmp(cal.getType(),"chinese") == 0 || uprv_strcmp(cal.getType(),"dangi") == 0);
+
+    const char* const calType = cal.getType(); // store in local variable to save repeated calls to getType().
+    UBool isHebrewCalendar = (uprv_strcmp(calType, "hebrew") == 0);
+    UBool isChineseCalendar = (uprv_strcmp(calType,"chinese") == 0 || uprv_strcmp(calType,"dangi") == 0);
 
     // If there are any spaces here, skip over them.  If we hit the end
     // of the string, then fail.
@@ -3186,7 +3190,7 @@ int32_t SimpleDateFormat::subParse(const UnicodeString& text, int32_t& start, UC
             // When parsing month numbers from the Hebrew Calendar, we might need to adjust the month depending on whether
             // or not it was a leap year.  We may or may not yet know what year it is, so might have to delay checking until
             // the year is parsed.
-            if (!strcmp(cal.getType(),"hebrew")) {
+            if (isHebrewCalendar) {
                 HebrewCalendar *hc = (HebrewCalendar*)&cal;
                 if (cal.isSet(UCAL_YEAR)) {
                    UErrorCode monthStatus = U_ZERO_ERROR;
@@ -3720,7 +3724,7 @@ int32_t SimpleDateFormat::subParse(const UnicodeString& text, int32_t& start, UC
         switch (patternCharIndex) {
         case UDAT_MONTH_FIELD:
             // See notes under UDAT_MONTH_FIELD case above
-            if (!strcmp(cal.getType(),"hebrew")) {
+            if (isHebrewCalendar) {
                 HebrewCalendar *hc = (HebrewCalendar*)&cal;
                 if (cal.isSet(UCAL_YEAR)) {
                    UErrorCode monthStatus = U_ZERO_ERROR;

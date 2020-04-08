@@ -192,7 +192,8 @@ template<class T> void umtx_initOnce(UInitOnce &uio, void (U_CALLCONV *fp)(T, UE
     // (VS std lib older than VS2017) || (VS std lib version < VS2019)
 #   define UMUTEX_CONSTEXPR
 #else
-#   define UMUTEX_CONSTEXPR constexpr
+//#   define UMUTEX_CONSTEXPR constexpr
+#   define UMUTEX_CONSTEXPR
 #endif
 
 /**

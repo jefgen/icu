@@ -1,3 +1,9 @@
+---
+layout: default
+title: Introduction
+permalink: /intro
+nav_order: 1
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html

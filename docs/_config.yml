@@ -1,12 +1,17 @@
 
 remote_theme: pmarsceill/just-the-docs
 
-# GitHub uses it's own markdown renderer
+# GitHub uses it's own markdown renderer.
+# We use this in order to try and have the docs pages match ones in the repo.
 markdown: CommonMarkGhPages
 
+# Plugins:
+#  jekyll-commonmark-ghpages -- This is needed in order to use CommonMarkGhPages
+#  jemoji                    -- For rendering emoji like :point_right:
 plugins:
   - jekyll-commonmark-ghpages
   - jekyll-remote-theme
+  - jemoji
 
 commonmark:
   options: ["SMART", "FOOTNOTES"]

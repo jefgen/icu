@@ -4,8 +4,10 @@ markdown: kramdown
 remote_theme: pmarsceill/just-the-docs
 
 logo: "/tools/images/iculogo_64.png"
-title: ICU User Guide
-description: ICU User Guide Documentation
+
+title: ICU-Documentation
+description: ICU Documentation
+
 baseurl: "/icu" # the subpath for the site
 url: "https://jefgen.github.io" # the base hostname & protocol for your site
 
@@ -22,6 +24,9 @@ aux_links:
 # Back to top link
 back_to_top: true
 back_to_top_text: "Back to top"
+
+# Enable heading anchors
+heading_anchors: true
 
 # Footer content 
 # appears at the bottom of every page's main content

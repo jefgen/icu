@@ -1,3 +1,11 @@
+---
+layout: default
+title: ICU Documentation
+nav_order: 1
+description: ICU Documentation
+permalink: /
+---
+
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html

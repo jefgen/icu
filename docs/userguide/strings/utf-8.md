@@ -1,6 +1,6 @@
 ---
 layout: default
-title: How To Use ICU
+title: UTF-8
 permalink: /utf-8
 nav_order: 1
 parent: Chars and Strings

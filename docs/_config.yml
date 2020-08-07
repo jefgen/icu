@@ -3,15 +3,13 @@ markdown: kramdown
 
 remote_theme: pmarsceill/just-the-docs
 
-logo: "/tools/images/iculogo_64.png"
-
 title: ICU-Documentation
 description: ICU Documentation
 
 baseurl: "/icu" # the subpath for the site
 url: "https://jefgen.github.io" # the base hostname & protocol for your site
 
-# search_enabled: true
+search_enabled: true
 
 # Color scheme currently only supports "dark" or nil (default)
 color_scheme: nil

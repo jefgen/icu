@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Introduction
-permalink: /intro
+permalink: /userguideintro
 nav_order: 2
 has_children: true
 ---

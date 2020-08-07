@@ -1,6 +1,5 @@
 
-# GitHub uses it's own markdown renderer
-markdown: CommonMarkGhPages
+markdown: kramdown
 
 remote_theme: pmarsceill/just-the-docs
 

@@ -1,8 +1,12 @@
 
+remote_theme: pmarsceill/just-the-docs
+
 # GitHub uses it's own markdown renderer
 markdown: CommonMarkGhPages
 
-remote_theme: pmarsceill/just-the-docs
+plugins:
+  - jekyll-commonmark-ghpages
+  - jekyll-remote-theme
 
 title: ICU Documentation
 description: ICU Documentation

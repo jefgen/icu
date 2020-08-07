@@ -8,6 +8,10 @@ plugins:
   - jekyll-commonmark-ghpages
   - jekyll-remote-theme
 
+commonmark:
+  options: ["SMART", "FOOTNOTES"]
+  extensions: ["strikethrough", "autolink", "table", "tagfilter"]
+
 title: ICU Documentation
 description: ICU Documentation
 

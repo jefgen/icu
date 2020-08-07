@@ -3,6 +3,7 @@ layout: default
 title: Introduction
 permalink: /intro
 nav_order: 1
+has_children: true
 ---
 <!--
 © 2020 and later: Unicode, Inc. and others.

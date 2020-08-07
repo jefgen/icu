@@ -3,7 +3,7 @@ markdown: kramdown
 
 remote_theme: pmarsceill/just-the-docs
 
-title: ICU-Documentation
+title: ICU Documentation
 description: ICU Documentation
 
 baseurl: "/icu" # the subpath for the site

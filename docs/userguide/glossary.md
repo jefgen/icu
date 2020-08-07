@@ -2,8 +2,7 @@
 layout: default
 title: Glossary
 permalink: /glossary
-nav_order: 9
-parent: Introduction
+nav_order: 9000
 ---
 <!--
 © 2020 and later: Unicode, Inc. and others.

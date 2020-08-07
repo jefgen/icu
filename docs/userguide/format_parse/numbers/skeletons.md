@@ -1,10 +1,27 @@
+---
+layout: default
+title: Number Skeletons
+permalink: /formatparse/skeletons
+nav_order: 4
+parent: Formatting
+---
 <!--
 © 2019 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html
 -->
 
-Number Skeletons
-================
+# Number Skeletons
+{: .no_toc }
+
+## Contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+## Overview
 
 Number skeletons are a locale-agnostic way to configure a NumberFormatter in
 ICU.  Number skeletons work in MessageFormat.

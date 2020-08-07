@@ -1,9 +1,27 @@
+---
+layout: default
+title: ICU4J FAQ
+permalink: /icufaq/icu4j-faq
+nav_order: 7
+parent: Misc
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html
 -->
 
 # ICU4J FAQ
+{: .no_toc }
+
+## Contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+# Overview
 
 This page contains frequently asked questions about the content provided with
 the International Components for Unicode for Java as well as basics on

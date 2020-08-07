@@ -13,7 +13,7 @@ License & terms of use: http://www.unicode.org/copyright.html
 *   [“Ignore Punctuation” Options](collation/customization/ignorepunct.md)
 *   [Collation Examples](collation/examples.md)
 *   [Collation FAQ](collation/faq.md)
-*   [ICU String Search Service](collation/icu-string-search-service.md)
+*   [ICU String Search Service](collation/string-search.md)
 *   [Conversion](conversion/index.md)
 *   [Compression](conversion/compression.md)
 *   [Using Converters](conversion/converters.md)
@@ -58,7 +58,6 @@ License & terms of use: http://www.unicode.org/copyright.html
 *   [Localizing with ICU](locale/localizing.md)
 *   [Resource Management](locale/resources.md)
 *   [Packaging ICU4C](packaging/index.md)
-*   [Packaging ICU4J](packaging-icu4j.md)
 *   [Plug-ins](packaging/plug-ins.md)
 *   [C/POSIX Migration](posix.md)
 *   [ICU Services](services.md)
@@ -80,4 +79,4 @@ License & terms of use: http://www.unicode.org/copyright.html
 *   [Unicode Basics](unicode.md)
 *   [Use From...](usefrom/index.md)
 *   [How To Use ICU4C From COBOL](usefrom/cobol.md)
-*   [Java Native Interface (JNI)](usefrom/jni.md)
+

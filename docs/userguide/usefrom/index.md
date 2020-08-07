@@ -1,3 +1,10 @@
+---
+layout: default
+title: Use From...
+permalink: /usefrom
+nav_order: 14
+has_children: true
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html

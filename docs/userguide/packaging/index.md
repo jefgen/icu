@@ -1,9 +1,25 @@
+---
+layout: default
+title: Packaging ICU4C
+permalink: /packaging
+nav_order: 1
+parent: ICU Data
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html
 -->
 
 # Packaging ICU4C
+{: .no_toc }
+
+## Contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
 
 ## Overview
 

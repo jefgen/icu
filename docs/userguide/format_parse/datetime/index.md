@@ -1,9 +1,25 @@
+---
+layout: default
+title: Formatting Dates and Times
+permalink: /formatparse/datetime
+nav_order: 7
+parent: Formatting
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html
 -->
 
 # Formatting Dates and Times
+{: .no_toc }
+
+## Contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
 
 ## Formatting Dates and Times Overview
 

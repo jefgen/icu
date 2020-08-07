@@ -1,19 +1,37 @@
+---
+layout: default
+title: Ignore Punctuation Options
+permalink: /collation/ignorepunct
+nav_order: 8
+parent: Collation
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html
 -->
 
-# “Ignore Punctuation” Options
+# "Ignore Punctuation" Options
+{: .no_toc }
+
+## Contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+## Overview
 
 By default, spaces and punctuation characters add primary (base character)
 differences. Such characters sort less-than digits and letters. For example, the
-default collation yields “De Anza” < “de-luge” < “deanza”.
+default collation yields "De Anza" < "de-luge" < "deanza".
 
-UCA/CLDR/ICU provide several options for “ignore punctuation” collation
+UCA/CLDR/ICU provide several options for "ignore punctuation" collation
 settings, also known as Variable Weighting or Alternate Handling. These options
-change the sorting behavior of “variable” characters algorithmically. “Variable”
+change the sorting behavior of "variable" characters algorithmically. "Variable"
 characters are those with low (but non-zero) primary weights up to a threshold,
-the “variable top”. By default, CLDR and ICU treat spaces and punctuation as
+the "variable top". By default, CLDR and ICU treat spaces and punctuation as
 variable. (This can be changed via API.) The DUCET also includes most symbols.
 
 ## Non-Ignorable
@@ -50,17 +68,17 @@ results of a stable sort algorithm with the non-ignorable column as input.
 
 ## Blanked
 
-The simplest option is to “ignore punctuation” completely, as if all variable
+The simplest option is to "ignore punctuation" completely, as if all variable
 characters (and following combining marks) had been removed from the input
 strings before comparing them.
 
-For example: “De Anza” = “De-Anza” = “DeAnza”.
+For example: "De Anza" = "De-Anza" = "DeAnza".
 
 In ICU, this option is selected with alternate=shifted and
 strength=primary|secondary|tertiary. (ICU does not support Blanked combined with
 strength=identical.)
 
-The implementation “blanks” out all weights of the variable characters’
+The implementation "blanks" out all weights of the variable characters’
 collation elements.
 
 *With all of the following options, variable characters are ignored on levels
@@ -84,12 +102,12 @@ Keys](http://www.unicode.org/reports/tr10/#Merging_Sort_Keys) (with shorter
 prefixes sorting less-than longer ones), like in last-name+first-name sorting,
 except only among tertiary-equal strings.
 
-For example: “de-luge” < “delu-ge” < “deluge” < “deluge-”.
+For example: "de-luge" < "delu-ge" < "deluge" < "deluge-".
 
 In ICU, this option is selected with alternate=shifted and
 strength=quaternary|identical.
 
-The implementation “shifts” the primary weight p of the collation element \[p,
+The implementation "shifts" the primary weight p of the collation element \[p,
 s, t, q\] of each variable characters down three levels: \[0, 0, 0, p\]. Regular
 characters with primary collation elements get a high quaternary weight, higher
 than that of any variable character.
@@ -98,8 +116,8 @@ Note that this behavior is different from collation on secondary and tertiary
 level, because normal collation elements get low secondary & tertiary weights
 but high quaternary weights. Adding an accent difference anywhere makes a string
 sort greater-than the string without it, and adding an accent difference earlier
-makes it sort greater-than adding it later. For example, “deanza” < “deanzä” <
-“deänza” < “dëanza”. (Compare the ‘ä’/‘ë’ positions here with the ‘-’ positions
+makes it sort greater-than adding it later. For example, "deanza" < "deanzä" <
+"deänza" < "dëanza". (Compare the ‘ä’/‘ë’ positions here with the ‘-’ positions
 above.)
 
 ## Shift-Trimmed
@@ -116,7 +134,7 @@ Among strings that compare tertiary-equal:
 *   Inserting a variable character *earlier* in a string makes it sort
     *less-than* inserting the variable character *later* in the string.
 
-For example: “deluge” < “de-luge” < “delu-ge” < “deluge-”.
+For example: "deluge" < "de-luge" < "delu-ge" < "deluge-".
 
 The Shift-Trimmed method works like Shifted, except that *trailing*
 high-quaternary weights (from regular characters) are removed (trimmed).
@@ -145,9 +163,9 @@ Among strings that compare tertiary-equal:
     *greater-than* inserting the variable character *later* in the string. (Like
     accent differences.)
 
-For example: “deluge” < “deluge-” < “delu-ge” < “de-luge”.
+For example: "deluge" < "deluge-" < "delu-ge" < "de-luge".
 
-The implementation “shifts” the primary weight p of the collation element \[p,
+The implementation "shifts" the primary weight p of the collation element \[p,
 s, t, q\] of each variable characters down three levels: \[0, 0, 0, p\]. Regular
 characters with primary collation elements get a *low* quaternary weight,
 *lower* than that of any variable character. This is consistent with collation

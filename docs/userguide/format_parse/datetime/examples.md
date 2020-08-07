@@ -1,9 +1,25 @@
+---
+layout: default
+title: Date and Time Formatting Examples
+permalink: /formatparse/datetime/examples
+nav_order: 8
+parent: Formatting
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html
 -->
 
 # Date and Time Formatting Examples
+{: .no_toc }
+
+## Contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
 
 ## Format
 

@@ -1,3 +1,10 @@
+---
+layout: default
+title: ustdio
+permalink: /io/ustdio
+nav_order: 1
+parent: IO
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html

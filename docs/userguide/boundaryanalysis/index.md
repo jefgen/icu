@@ -1,9 +1,25 @@
+---
+layout: default
+title: Boundary Analysis
+permalink: /boundaryanalysis
+nav_order: 10
+has_children: true
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html
 -->
 
 # Boundary Analysis
+{: .no_toc }
+
+## Contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
 
 ## Overview of Text Boundary Analysis
 

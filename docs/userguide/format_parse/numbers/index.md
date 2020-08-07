@@ -1,3 +1,10 @@
+---
+layout: default
+title: Formatting Numbers
+permalink: /formatparse/numbers
+nav_order: 1
+parent: Formatting
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html

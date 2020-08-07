@@ -1,3 +1,10 @@
+---
+layout: default
+title: Locale Examples
+permalink: /locale/examples
+nav_order: 1
+parent: Locales and Resources
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html

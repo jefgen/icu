@@ -1,3 +1,10 @@
+---
+layout: default
+title: Glossary
+permalink: /glossary
+nav_order: 9
+parent: Introduction
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html

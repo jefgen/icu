@@ -2,8 +2,9 @@
 layout: default
 title: Formatting Messages
 permalink: /formatparse/messages
-nav_order: 9
+nav_order: 3
 parent: Formatting
+has_children: true
 ---
 <!--
 © 2020 and later: Unicode, Inc. and others.

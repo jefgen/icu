@@ -2,8 +2,9 @@
 layout: default
 title: Formatting Dates and Times
 permalink: /formatparse/datetime
-nav_order: 7
+nav_order: 2
 parent: Formatting
+has_children: true
 ---
 <!--
 © 2020 and later: Unicode, Inc. and others.

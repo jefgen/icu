@@ -2,8 +2,9 @@
 layout: default
 title: Number Skeletons
 permalink: /formatparse/skeletons
-nav_order: 4
-parent: Formatting
+nav_order: 3
+grand_parent: Formatting
+parent: Formatting Numbers
 ---
 <!--
 © 2019 and later: Unicode, Inc. and others.

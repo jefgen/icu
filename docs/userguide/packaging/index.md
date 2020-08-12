@@ -2,7 +2,7 @@
 layout: default
 title: Packaging ICU4C
 permalink: /packaging
-nav_order: 1
+nav_order: 3
 parent: ICU Data
 ---
 <!--

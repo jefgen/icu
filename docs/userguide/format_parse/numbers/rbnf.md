@@ -3,7 +3,8 @@ layout: default
 title: RuleBasedNumberFormat
 permalink: /formatparse/rbnf
 nav_order: 5
-parent: Formatting
+grand_parent: Formatting
+parent: Formatting Numbers
 ---
 <!--
 © 2020 and later: Unicode, Inc. and others.

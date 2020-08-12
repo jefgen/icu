@@ -2,8 +2,9 @@
 layout: default
 title: Message Formatting Examples
 permalink: /formatparse/messages/examples
-nav_order: 10
-parent: Formatting
+nav_order: 1
+parent: Formatting Messages
+grand_parent: Formatting
 ---
 <!--
 © 2020 and later: Unicode, Inc. and others.

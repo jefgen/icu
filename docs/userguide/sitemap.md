@@ -1,3 +1,9 @@
+---
+layout: default
+title: Sitemap
+permalink: /sitemap
+nav_order: 8000
+---
 <!--
 © 2020 and later: Unicode, Inc. and others.
 License & terms of use: http://www.unicode.org/copyright.html

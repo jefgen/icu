@@ -1,7 +1,6 @@
 ---
 layout: default
 title: ICU Data Build Tool
-permalink: /icu_data/buildtool
 nav_order: 1
 parent: ICU Data
 ---

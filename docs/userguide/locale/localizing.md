@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Localizing with ICU
-permalink: /locale/localizing
 nav_order: 3
 parent: Locales and Resources
 ---

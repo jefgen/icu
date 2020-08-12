@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Break Rules
-permalink: /boundaryanalysis/break-rules
 nav_order: 1
 parent: Boundary Analysis
 ---
@@ -137,7 +136,7 @@ WB5 through WB13 combine to piece together longer words from multiple short
 segments.
 
 `!!chain;` enables chaining in a rule set. It is disabled by default for back
-compatibility - very old versions of ICU did not support it, and it was
+compatibility—very old versions of ICU did not support it, and it was
 originally introduced as an option.
 
 #### Parentheses and Alternation

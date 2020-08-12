@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Cobol
-permalink: /usefrom/cobol
 nav_order: 1
 parent: Use From...
 ---

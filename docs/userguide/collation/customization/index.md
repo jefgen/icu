@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Customization
-permalink: /collation/customization
 nav_order: 3
 parent: Collation
 ---

@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Collation FAQ
-permalink: /collation/faq
 nav_order: 5
 parent: Collation
 ---

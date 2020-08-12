@@ -1,7 +1,6 @@
 ---
 layout: default
 title: BiDi Algorithm
-permalink: /transforms/bidi
 nav_order: 2
 parent: Transforms
 ---

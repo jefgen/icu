@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Legacy NumberFormat
-permalink: /formatparse/legacy-numberformat
 nav_order: 1
 grand_parent: Formatting
 parent: Formatting Numbers

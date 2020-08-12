@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Boundary Analysis
-permalink: /boundaryanalysis
 nav_order: 10
 has_children: true
 ---

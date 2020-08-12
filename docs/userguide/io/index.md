@@ -1,7 +1,6 @@
 ---
 layout: default
 title: IO
-permalink: /io
 nav_order: 11
 has_children: true
 ---

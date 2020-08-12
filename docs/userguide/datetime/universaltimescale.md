@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Universal Time Scale
-permalink: /datetime/Universal Time Scale
 nav_order: 5
 parent: Date/Time
 ---

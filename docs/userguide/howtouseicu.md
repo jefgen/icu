@@ -1,7 +1,6 @@
 ---
 layout: default
 title: How To Use ICU
-permalink: /howtouseicu
 nav_order: 2
 parent: ICU
 ---

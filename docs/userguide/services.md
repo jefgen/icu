@@ -1,7 +1,6 @@
 ---
 layout: default
 title: ICU Services
-permalink: /services
 nav_order: 4
 parent: ICU
 ---

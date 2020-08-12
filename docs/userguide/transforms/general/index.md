@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Transforms
-permalink: /transforms/general
 nav_order: 4
 parent: Transforms
 ---

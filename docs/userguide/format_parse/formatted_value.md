@@ -1,7 +1,6 @@
 ---
 layout: default
 title: FormattedValue
-permalink: /formatparse/formattedvalue
 nav_order: 4
 grand_parent: Formatting
 parent: Formatting Numbers

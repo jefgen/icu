@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Coding Guidelines
-permalink: /dev/codingguidelines
 nav_order: 1
 parent: Misc
 ---

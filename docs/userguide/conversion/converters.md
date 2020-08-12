@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Converter
-permalink: /conversion/converter
 nav_order: 1
 parent: Conversion
 ---

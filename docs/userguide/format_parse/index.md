@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Formatting
-permalink: /formatparse
 nav_order: 7
 has_children: true
 ---

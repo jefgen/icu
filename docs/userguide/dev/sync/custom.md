@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Custom ICU4C Synchronization
-permalink: /dev/sync/custom
 nav_order: 3
 parent: Misc
 ---

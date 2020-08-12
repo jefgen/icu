@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Conversion Data
-permalink: /conversion/data
 nav_order: 2
 parent: Conversion
 ---

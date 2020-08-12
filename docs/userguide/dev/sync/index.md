@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Synchronization
-permalink: /dev/sync
 nav_order: 2
 parent: Misc
 ---

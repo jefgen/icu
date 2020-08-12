@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Calendar Examples
-permalink: /datetime/calendar/examples
 nav_order: 2
 parent: Date/Time
 ---

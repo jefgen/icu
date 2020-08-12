@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Architecture
-permalink: /collation/architecture
 nav_order: 2
 parent: Collation
 ---

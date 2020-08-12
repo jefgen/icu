@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Date and Time Formatting Examples
-permalink: /formatparse/datetime/examples
 nav_order: 1
 grand_parent: Formatting
 parent: Formatting Dates and Times

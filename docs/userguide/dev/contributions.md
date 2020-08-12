@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Contributions
-permalink: /dev/contributions
 nav_order: 4
 parent: Misc
 ---

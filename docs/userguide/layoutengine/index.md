@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Layout Engine
-permalink: /layoutengine
 nav_order: 12
 has_children: true
 ---

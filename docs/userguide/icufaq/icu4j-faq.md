@@ -1,7 +1,6 @@
 ---
 layout: default
 title: ICU4J FAQ
-permalink: /icufaq/icu4j-faq
 nav_order: 7
 parent: Misc
 ---

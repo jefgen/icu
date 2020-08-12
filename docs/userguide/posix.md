@@ -1,7 +1,6 @@
 ---
 layout: default
 title: C/POSIX Migration
-permalink: /posix
 nav_order: 6
 parent: ICU
 ---

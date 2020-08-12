@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Locale Examples
-permalink: /locale/examples
 nav_order: 1
 parent: Locales and Resources
 ---

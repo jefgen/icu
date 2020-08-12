@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Collation Examples
-permalink: /collation/examples
 nav_order: 7
 parent: Collation
 ---

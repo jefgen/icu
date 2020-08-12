@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Formatting Numbers
-permalink: /formatparse/numbers
 nav_order: 1
 parent: Formatting
 has_children: true

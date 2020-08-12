@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Rounding Modes
-permalink: /formatparse/roundingmodes
 nav_order: 2
 grand_parent: Formatting
 parent: Formatting Numbers

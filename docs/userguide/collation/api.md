@@ -1,7 +1,6 @@
 ---
 layout: default
 title: API Details
-permalink: /collation/api
 nav_order: 6
 parent: Collation
 ---

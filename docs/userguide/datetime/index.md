@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Date/Time
-permalink: /datetime
 nav_order: 6
 has_children: true
 ---

@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Case Mappings
-permalink: /transforms/casemappings
 nav_order: 1
 parent: Transforms
 ---

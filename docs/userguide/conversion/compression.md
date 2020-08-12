@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Compression
-permalink: /conversion/compression
 nav_order: 4
 parent: Conversion
 ---

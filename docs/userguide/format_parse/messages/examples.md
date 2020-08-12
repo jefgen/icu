@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Message Formatting Examples
-permalink: /formatparse/messages/examples
 nav_order: 1
 parent: Formatting Messages
 grand_parent: Formatting

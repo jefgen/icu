@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Conversion
-permalink: /conversion
 nav_order: 4
 has_children: true
 ---

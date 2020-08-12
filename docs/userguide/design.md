@@ -1,7 +1,6 @@
 ---
 layout: default
 title: ICU Design
-permalink: /design
 nav_order: 5
 parent: ICU
 ---

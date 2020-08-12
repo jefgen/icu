@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Resource and Data Tracing
-permalink: /icu_data/tracing
 nav_order: 2
 parent: ICU Data
 ---

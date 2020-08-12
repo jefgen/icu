@@ -1,7 +1,6 @@
 ---
 layout: default
 title: TimeZone Classes
-permalink: /datetime/timezone
 nav_order: 3
 parent: Date/Time
 ---

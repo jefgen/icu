@@ -1,7 +1,6 @@
 ---
 layout: default
 title: ICU4J Locale Service Provider
-permalink: /icu4j-locale-service-provider
 nav_order: 7
 parent: ICU
 ---

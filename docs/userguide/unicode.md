@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Unicode Basics
-permalink: /unicode
 nav_order: 3
 parent: ICU
 ---

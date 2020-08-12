@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Charset Detection
-permalink: /conversion/detection
 nav_order: 3
 parent: Conversion
 ---

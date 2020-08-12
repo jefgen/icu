@@ -1,7 +1,6 @@
 ---
 layout: default
 title: String Search
-permalink: /collation/string-search
 nav_order: 4
 parent: Collation
 ---

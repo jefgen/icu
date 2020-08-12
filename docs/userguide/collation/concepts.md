@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Concepts
-permalink: /collation/concepts
 nav_order: 1
 parent: Collation
 ---

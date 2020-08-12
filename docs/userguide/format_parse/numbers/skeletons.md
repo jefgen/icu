@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Number Skeletons
-permalink: /formatparse/skeletons
 nav_order: 3
 grand_parent: Formatting
 parent: Formatting Numbers

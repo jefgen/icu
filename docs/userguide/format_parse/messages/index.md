@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Formatting Messages
-permalink: /formatparse/messages
 nav_order: 3
 parent: Formatting
 has_children: true
@@ -194,7 +193,7 @@ It is also a bad internationalization practice, because most companies only
 translate into "generic" versions of the languages (French, or Spanish, or
 Arabic). So the translated patterns get used in tens of countries. On the other
 hand, skeletons are localized according to the MessageFormat locale, which
-should include regional variants (e.g., "fr-CA").
+should include regional variants (e.g., “fr-CA”).
 
 #### Custom Format Objects (discouraged)
 

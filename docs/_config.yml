@@ -16,7 +16,7 @@ github_username:  unicode-org
 
 remote_theme: pmarsceill/just-the-docs
 
-# GitHub uses it's own markdown renderer called CommonMarkGhPages.
+# GitHub uses its own markdown renderer called CommonMarkGhPages.
 #
 # To use this we'd need to set the following options:
 #     markdown: CommonMarkGhPages
@@ -74,7 +74,7 @@ back_to_top_text: "Back to top"
 heading_anchors: true
 
 # Footer content: appears at the bottom of every page after the main content.
-footer_content: "Copyright &copy; 2016 and later Unicode, Inc. and others. All Rights Reserved. <a href=\"http://www.unicode.org/copyright.html\">Terms of use and License</a>."
+footer_content: "&copy; 2016 and later: Unicode, Inc. and others. License &amp; terms of use: <a href=\"http://www.unicode.org/copyright.html\">http://www.unicode.org/copyright.html</a>"
 
 # Footer content: Add a "Edit this page on GitHub" link.
 # Note: I think this would be better at the *top* of the page, but it isn't possible to do that by default with just-the-docs.

@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Paragraph Layout
-permalink: /layoutengine/paragraph
 nav_order: 1
 parent: Layout Engine
 ---

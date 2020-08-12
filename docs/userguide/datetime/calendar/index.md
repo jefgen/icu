@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Calendar Services
-permalink: /datetime/calendar
 nav_order: 1
 parent: Date/Time
 ---

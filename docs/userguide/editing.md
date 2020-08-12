@@ -1,7 +1,6 @@
 ---
 layout: default
 title: User Guide Editing
-permalink: /editing
 nav_order: 5
 parent: Misc
 ---

@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Transform Rule Tutorial
-permalink: /transforms/general/rules
 nav_order: 5
 parent: Transforms
 ---

@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Plug-ins
-permalink: /packaging/plug-ins
 nav_order: 4
 parent: ICU Data
 ---

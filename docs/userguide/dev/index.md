@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Misc
-permalink: /dev
 nav_order: 15
 has_children: true
 ---

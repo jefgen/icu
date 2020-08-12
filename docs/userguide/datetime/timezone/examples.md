@@ -1,7 +1,6 @@
 ---
 layout: default
 title:  Date and Time Zone Examples
-permalink: /datetime/timezone/examples
 nav_order: 4
 parent: Date/Time
 ---

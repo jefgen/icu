@@ -1,7 +1,6 @@
 ---
 layout: default
 title: RuleBasedNumberFormat
-permalink: /formatparse/rbnf
 nav_order: 5
 grand_parent: Formatting
 parent: Formatting Numbers

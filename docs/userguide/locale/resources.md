@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Resources
-permalink: /locale/resources
 nav_order: 2
 parent: Locales and Resources
 ---

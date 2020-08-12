@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Collation
-permalink: /collation
 nav_order: 9
 has_children: true
 ---

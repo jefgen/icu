@@ -1,7 +1,6 @@
 ---
 layout: default
 title: ICU FAQ
-permalink: /icufaq
 nav_order: 6
 parent: Misc
 ---

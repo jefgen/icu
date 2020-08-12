@@ -1,7 +1,6 @@
 ---
 layout: default
 title: ustdio
-permalink: /io/ustdio
 nav_order: 1
 parent: IO
 ---

@@ -61,7 +61,7 @@ uprint(const UChar *s,
     /* perform the conversion */
     ucnv_fromUnicode(converter, &myTarget, myTarget + arraySize,
              &mySource, mySourceEnd, NULL,
-             TRUE, status);
+             1, status);
 
     /* Write the converted data to the FILE* */
     fwrite(buf, sizeof(char), myTarget - buf, f);

@@ -378,7 +378,7 @@ private:
      *                             back to the locale.
      */
     void initialize(const Locale& locale, UErrorCode& success,
-        UBool useLastResortData = FALSE, const NumberingSystem* ns = nullptr);
+        UBool useLastResortData = 0, const NumberingSystem* ns = nullptr);
 
     /**
      * Initialize the symbols with default values.
@@ -543,12 +543,12 @@ inline const UnicodeString& DecimalFormatSymbols::getConstDigitSymbol(int32_t di
 // -------------------------------------
 
 inline void
-DecimalFormatSymbols::setSymbol(ENumberFormatSymbol symbol, const UnicodeString &value, const UBool propogateDigits = TRUE) {
+DecimalFormatSymbols::setSymbol(ENumberFormatSymbol symbol, const UnicodeString &value, const UBool propogateDigits = 1) {
     if (symbol == kCurrencySymbol) {
-        fIsCustomCurrencySymbol = TRUE;
+        fIsCustomCurrencySymbol = 1;
     }
     else if (symbol == kIntlCurrencySymbol) {
-        fIsCustomIntlCurrencySymbol = TRUE;
+        fIsCustomIntlCurrencySymbol = 1;
     }
     if(symbol<kFormatSymbolCount) {
         fSymbols[symbol]=value;

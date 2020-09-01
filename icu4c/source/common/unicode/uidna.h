@@ -185,7 +185,7 @@ typedef struct UIDNAInfo {
     /** sizeof(UIDNAInfo) @stable ICU 4.6 */
     int16_t size;
     /**
-     * Set to TRUE if transitional and nontransitional processing produce different results.
+     * Set to true if transitional and nontransitional processing produce different results.
      * For details see C++ IDNAInfo::isTransitionalDifferent().
      * @stable ICU 4.6
      */
@@ -207,7 +207,7 @@ typedef struct UIDNAInfo {
  */
 #define UIDNA_INFO_INITIALIZER { \
     (int16_t)sizeof(UIDNAInfo), \
-    FALSE, FALSE, \
+    0, 0, \
     0, 0, 0 }
 
 /**

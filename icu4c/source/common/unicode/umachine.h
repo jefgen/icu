@@ -259,8 +259,9 @@
 
 /**
  * The ICU boolean type, a signed-byte integer.
- * ICU-specific for historical reasons.
- * The C and C++ standards used to not define a bool type.
+ * ICU-specific for historical reasons: The C and C++ standards used to not define type bool.
+ * Also provides a fixed type definition, as opposed to
+ * type bool whose details (e.g., sizeof) may vary by compiler and between C and C++.
  *
  * @stable ICU 2.0
  */
@@ -284,20 +285,20 @@ typedef int8_t UBool;
         defined(U_COMMON_IMPLEMENTATION) || defined(U_I18N_IMPLEMENTATION) || \
         defined(U_IO_IMPLEMENTATION) || defined(U_LAYOUTEX_IMPLEMENTATION) || \
         defined(U_TOOLUTIL_IMPLEMENTATION)
-    // Inside ICU: Keep using FALSE & TRUE.
+    // Inside ICU: Keep FALSE & TRUE available.
 #   define U_DEFINE_FALSE_AND_TRUE 1
 #else
     // Outside ICU: Avoid collision with non-macro definitions of FALSE & TRUE.
 #   define U_DEFINE_FALSE_AND_TRUE 0
 #endif
 
-#if U_DEFINE_FALSE_AND_TRUE
+#if U_DEFINE_FALSE_AND_TRUE || defined(U_IN_DOXYGEN)
 #ifndef TRUE
-/** The TRUE value of a UBool @stable ICU 2.0 */
+/** The TRUE value of a UBool @deprecated ICU 68 */
 #   define TRUE  1
 #endif
 #ifndef FALSE
-/** The FALSE value of a UBool @stable ICU 2.0 */
+/** The FALSE value of a UBool @deprecated ICU 68*/
 #   define FALSE 0
 #endif
 #endif  // U_DEFINE_FALSE_AND_TRUE

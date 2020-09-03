@@ -262,7 +262,7 @@ public:
     inline UBool hasUniqueValue(int32_t &uniqueValue) const {
         const uint8_t *pos=pos_;
         // Skip the rest of a pending linear-match node.
-        return pos!=NULL && findUniqueValue(pos+remainingMatchLength_+1, 0, uniqueValue);
+        return pos!=NULL && findUniqueValue(pos+remainingMatchLength_+1, false, uniqueValue);
     }
 
     /**

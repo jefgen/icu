@@ -23,6 +23,7 @@
 
 #if !UCONFIG_NO_IDNA
 
+#include <stdbool.h>
 #include "unicode/parseerr.h"
 
 #if U_SHOW_CPLUSPLUS_API
@@ -207,7 +208,7 @@ typedef struct UIDNAInfo {
  */
 #define UIDNA_INFO_INITIALIZER { \
     (int16_t)sizeof(UIDNAInfo), \
-    0, 0, \
+    false, false, \
     0, 0, 0 }
 
 /**

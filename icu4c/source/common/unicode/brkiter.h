@@ -655,7 +655,7 @@ private:
 
 inline UBool BreakIterator::isBufferClone()
 {
-    return 0;
+    return false;
 }
 
 #endif /* U_HIDE_DEPRECATED_API */

@@ -920,7 +920,7 @@ private:
      * @param useLastResortData    determine if use last resort data
      */
     void initializeData(const Locale& locale, const char *type,
-                        UErrorCode& status, UBool useLastResortData = 0);
+                        UErrorCode& status, UBool useLastResortData = false);
 
     /**
      * Copy or alias an array in another object, as appropriate.

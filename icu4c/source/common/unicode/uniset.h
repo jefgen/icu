@@ -707,7 +707,7 @@ public:
      * @stable ICU 2.0
      */
     virtual UnicodeString& toPattern(UnicodeString& result,
-                             UBool escapeUnprintable = 0) const;
+                                     UBool escapeUnprintable = false) const;
 
     /**
      * Modifies this set to contain those code points which have the given value

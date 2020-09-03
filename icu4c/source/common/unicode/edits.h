@@ -207,8 +207,8 @@ public:
          */
         Iterator() :
                 array(nullptr), index(0), length(0),
-                remaining(0), onlyChanges_(0), coarse(0),
-                dir(0), changed(0), oldLength_(0), newLength_(0),
+                remaining(0), onlyChanges_(false), coarse(false),
+                dir(0), changed(false), oldLength_(0), newLength_(0),
                 srcIndex(0), replIndex(0), destIndex(0) {}
         /**
          * Copy constructor.
@@ -251,7 +251,7 @@ public:
          * @stable ICU 59
          */
         UBool findSourceIndex(int32_t i, UErrorCode &errorCode) {
-            return findIndex(i, 1, errorCode) == 0;
+            return findIndex(i, true, errorCode) == 0;
         }
 
         /**
@@ -274,7 +274,7 @@ public:
          * @stable ICU 60
          */
         UBool findDestinationIndex(int32_t i, UErrorCode &errorCode) {
-            return findIndex(i, 0, errorCode) == 0;
+            return findIndex(i, false, errorCode) == 0;
         }
 
         /**
@@ -436,7 +436,7 @@ public:
      * @stable ICU 59
      */
     Iterator getCoarseChangesIterator() const {
-        return Iterator(array, length, 1, 1);
+        return Iterator(array, length, true, true);
     }
 
     /**
@@ -448,7 +448,7 @@ public:
      * @stable ICU 59
      */
     Iterator getCoarseIterator() const {
-        return Iterator(array, length, 0, 1);
+        return Iterator(array, length, false, true);
     }
 
     /**
@@ -460,7 +460,7 @@ public:
      * @stable ICU 59
      */
     Iterator getFineChangesIterator() const {
-        return Iterator(array, length, 1, 0);
+        return Iterator(array, length, true, false);
     }
 
     /**
@@ -471,7 +471,7 @@ public:
      * @stable ICU 59
      */
     Iterator getFineIterator() const {
-        return Iterator(array, length, 0, 0);
+        return Iterator(array, length, false, false);
     }
 
     /**

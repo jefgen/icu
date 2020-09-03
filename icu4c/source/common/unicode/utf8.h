@@ -34,6 +34,7 @@
 #ifndef __UTF8_H__
 #define __UTF8_H__
 
+#include <stdbool.h>
 #include "unicode/umachine.h"
 #ifndef __UTF_H__
 #   include "unicode/utf.h"
@@ -472,7 +473,7 @@ utf8_back1SafeBody(const uint8_t *s, int32_t start, int32_t i);
         (s)[(i)++]=(uint8_t)(((__uc>>6)&0x3f)|0x80); \
         (s)[(i)++]=(uint8_t)((__uc&0x3f)|0x80); \
     } else { \
-        (isError)=1; \
+        (isError)=true; \
     } \
 } UPRV_BLOCK_MACRO_END
 

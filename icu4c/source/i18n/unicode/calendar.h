@@ -2531,7 +2531,7 @@ Calendar::internalSet(UCalendarDateFields field, int32_t value)
 {
     fFields[field] = value;
     fStamp[field] = kInternallySet;
-    fIsSet[field]     = 1; // Remove later
+    fIsSet[field]     = true; // Remove later
 }
 
 

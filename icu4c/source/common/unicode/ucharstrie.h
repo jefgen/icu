@@ -277,7 +277,7 @@ public:
     inline UBool hasUniqueValue(int32_t &uniqueValue) const {
         const char16_t *pos=pos_;
         // Skip the rest of a pending linear-match node.
-        return pos!=NULL && findUniqueValue(pos+remainingMatchLength_+1, 0, uniqueValue);
+        return pos!=NULL && findUniqueValue(pos+remainingMatchLength_+1, false, uniqueValue);
     }
 
     /**
@@ -371,7 +371,7 @@ public:
         UBool truncateAndStop() {
             pos_=NULL;
             value_=-1;  // no real value for str
-            return 1;
+            return true;
         }
 
         const char16_t *branchNext(const char16_t *pos, int32_t length, UErrorCode &errorCode);

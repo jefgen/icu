@@ -34,6 +34,7 @@
 #ifndef __UTF16_H__
 #define __UTF16_H__
 
+#include <stdbool.h>
 #include "unicode/umachine.h"
 #ifndef __UTF_H__
 #   include "unicode/utf.h"
@@ -396,7 +397,7 @@
         (s)[(i)++]=(uint16_t)(((c)>>10)+0xd7c0); \
         (s)[(i)++]=(uint16_t)(((c)&0x3ff)|0xdc00); \
     } else /* c>0x10ffff or not enough space */ { \
-        (isError)=1; \
+        (isError)=true; \
     } \
 } UPRV_BLOCK_MACRO_END
 

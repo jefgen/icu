@@ -49,6 +49,7 @@
  * ANSI C headers:
  * stddef.h defines wchar_t
  */
+#include <stdbool.h>
 #include <stddef.h>
 
 /*==========================================================================*/
@@ -174,7 +175,7 @@
  * @internal
  */
 #ifndef UPRV_BLOCK_MACRO_END
-#define UPRV_BLOCK_MACRO_END while (0)
+#define UPRV_BLOCK_MACRO_END while (false)
 #endif
 
 /*==========================================================================*/
@@ -294,11 +295,19 @@ typedef int8_t UBool;
 
 #if U_DEFINE_FALSE_AND_TRUE || defined(U_IN_DOXYGEN)
 #ifndef TRUE
-/** The TRUE value of a UBool @deprecated ICU 68 */
+/**
+ * The TRUE value of a UBool.
+ *
+ * @deprecated ICU 68 Use standard "true" instead.
+ */
 #   define TRUE  1
 #endif
 #ifndef FALSE
-/** The FALSE value of a UBool @deprecated ICU 68*/
+/**
+ * The FALSE value of a UBool.
+ *
+ * @deprecated ICU 68 Use standard "false" instead.
+ */
 #   define FALSE 0
 #endif
 #endif  // U_DEFINE_FALSE_AND_TRUE

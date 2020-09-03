@@ -141,7 +141,7 @@ public:
     inline UnicodeString getUnicodeString(UErrorCode &errorCode) const {
         int32_t len = 0;
         const UChar *r = getString(len, errorCode);
-        return UnicodeString(1, r, len);
+        return UnicodeString(true, r, len);
     }
 
     /**
@@ -152,7 +152,7 @@ public:
     inline UnicodeString getAliasUnicodeString(UErrorCode &errorCode) const {
         int32_t len = 0;
         const UChar *r = getAliasString(len, errorCode);
-        return UnicodeString(1, r, len);
+        return UnicodeString(true, r, len);
     }
 
     /**

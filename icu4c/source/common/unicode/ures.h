@@ -814,7 +814,7 @@ ures_getUnicodeString(const UResourceBundle *resB, UErrorCode* status) {
     int32_t len = 0;
     const UChar *r = ures_getString(resB, &len, status);
     if(U_SUCCESS(*status)) {
-        result.setTo(1, r, len);
+        result.setTo(true, r, len);
     } else {
         result.setToBogus();
     }
@@ -839,7 +839,7 @@ ures_getNextUnicodeString(UResourceBundle *resB, const char ** key, UErrorCode* 
     int32_t len = 0;
     const UChar* r = ures_getNextString(resB, &len, key, status);
     if(U_SUCCESS(*status)) {
-        result.setTo(1, r, len);
+        result.setTo(true, r, len);
     } else {
         result.setToBogus();
     }
@@ -861,7 +861,7 @@ ures_getUnicodeStringByIndex(const UResourceBundle *resB, int32_t indexS, UError
     int32_t len = 0;
     const UChar* r = ures_getStringByIndex(resB, indexS, &len, status);
     if(U_SUCCESS(*status)) {
-        result.setTo(1, r, len);
+        result.setTo(true, r, len);
     } else {
         result.setToBogus();
     }
@@ -884,7 +884,7 @@ ures_getUnicodeStringByKey(const UResourceBundle *resB, const char* key, UErrorC
     int32_t len = 0;
     const UChar* r = ures_getStringByKey(resB, key, &len, status);
     if(U_SUCCESS(*status)) {
-        result.setTo(1, r, len);
+        result.setTo(true, r, len);
     } else {
         result.setToBogus();
     }

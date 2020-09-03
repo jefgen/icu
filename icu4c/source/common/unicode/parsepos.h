@@ -196,9 +196,9 @@ inline UBool
 ParsePosition::operator==(const ParsePosition& copy) const
 {
   if(index != copy.index || errorIndex != copy.errorIndex)
-  return 0;
+  return false;
   else
-  return 1;
+  return true;
 }
 
 inline UBool

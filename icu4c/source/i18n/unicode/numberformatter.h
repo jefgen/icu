@@ -372,9 +372,9 @@ class U_I18N_API Notation : public UMemory {
     UBool copyErrorTo(UErrorCode &status) const {
         if (fType == NTN_ERROR) {
             status = fUnion.errorCode;
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
     // To allow MacroProps to initialize empty instances:
@@ -726,9 +726,9 @@ class U_I18N_API Precision : public UMemory {
     UBool copyErrorTo(UErrorCode &status) const {
         if (fType == RND_ERROR) {
             status = fUnion.errorCode;
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
     // On the parent type so that this method can be called internally on Precision instances.
@@ -970,9 +970,9 @@ class U_I18N_API IntegerWidth : public UMemory {
     UBool copyErrorTo(UErrorCode &status) const {
         if (fHasError) {
             status = fUnion.errorCode;
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
     void apply(impl::DecimalQuantity &quantity, UErrorCode &status) const;
@@ -1098,9 +1098,9 @@ class U_I18N_API Scale : public UMemory {
     UBool copyErrorTo(UErrorCode &status) const {
         if (fError != U_ZERO_ERROR) {
             status = fError;
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
     void applyTo(impl::DecimalQuantity& quantity) const;
@@ -1193,12 +1193,12 @@ class U_I18N_API SymbolsWrapper : public UMemory {
     UBool copyErrorTo(UErrorCode &status) const {
         if (fType == SYMPTR_DFS && fPtr.dfs == nullptr) {
             status = U_MEMORY_ALLOCATION_ERROR;
-            return 1;
+            return true;
         } else if (fType == SYMPTR_NS && fPtr.ns == nullptr) {
             status = U_MEMORY_ALLOCATION_ERROR;
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
   private:
@@ -1342,9 +1342,9 @@ class U_I18N_API Padder : public UMemory {
     UBool copyErrorTo(UErrorCode &status) const {
         if (fWidth == -3) {
             status = fUnion.errorCode;
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
     bool isValid() const {
@@ -2127,7 +2127,7 @@ class U_I18N_API NumberFormatterSettings {
     UBool copyErrorTo(UErrorCode &outErrorCode) const {
         if (U_FAILURE(outErrorCode)) {
             // Do not overwrite the older error code
-            return 1;
+            return true;
         }
         fMacros.copyErrorTo(outErrorCode);
         return U_FAILURE(outErrorCode);

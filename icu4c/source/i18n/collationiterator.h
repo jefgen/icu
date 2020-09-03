@@ -76,9 +76,9 @@ private:
             // (Rather than buffer.getCapacity().)
             if(length < INITIAL_CAPACITY || ensureAppendCapacity(1, errorCode)) {
                 ++length;
-                return 1;
+                return true;
             } else {
-                return 0;
+                return false;
             }
         }
 

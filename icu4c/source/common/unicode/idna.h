@@ -273,7 +273,7 @@ public:
      * Constructor for stack allocation.
      * @stable ICU 4.6
      */
-    IDNAInfo() : errors(0), labelErrors(0), isTransDiff(0), isBiDi(0), isOkBiDi(1) {}
+    IDNAInfo() : errors(0), labelErrors(0), isTransDiff(false), isBiDi(false), isOkBiDi(true) {}
     /**
      * Were there IDNA processing errors?
      * @return true if there were processing errors
@@ -310,9 +310,9 @@ private:
 
     void reset() {
         errors=labelErrors=0;
-        isTransDiff=0;
-        isBiDi=0;
-        isOkBiDi=1;
+        isTransDiff=false;
+        isBiDi=false;
+        isOkBiDi=true;
     }
 
     uint32_t errors, labelErrors;

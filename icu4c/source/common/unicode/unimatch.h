@@ -141,7 +141,7 @@ public:
      * @stable ICU 2.4
      */
     virtual UnicodeString& toPattern(UnicodeString& result,
-                                     UBool escapeUnprintable = 0) const = 0;
+                                     UBool escapeUnprintable = false) const = 0;
 
     /**
      * Returns true if this matcher will match a character c, where c

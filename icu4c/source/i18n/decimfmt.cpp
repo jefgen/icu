@@ -31,14 +31,6 @@ using namespace icu::numparse::impl;
 using ERoundingMode = icu::DecimalFormat::ERoundingMode;
 using EPadPosition = icu::DecimalFormat::EPadPosition;
 
-// MSVC VS2015 warns C4805 when comparing bool with UBool, VS2017 no longer emits this warning.
-// TODO: Move this macro into a better place?
-#if U_PF_WINDOWS <= U_PLATFORM && U_PLATFORM <= U_PF_CYGWIN
-#define UBOOL_TO_BOOL(b) static_cast<bool>(b)
-#else
-#define UBOOL_TO_BOOL(b) b
-#endif
-
 
 UOBJECT_DEFINE_RTTI_IMPLEMENTATION(DecimalFormat)
 
@@ -372,7 +364,7 @@ void DecimalFormat::setGroupingUsed(UBool enabled) {
     if (fields == nullptr) {
         return;
     }
-    if (UBOOL_TO_BOOL(enabled) == fields->properties.groupingUsed) { return; }
+    if (enabled == fields->properties.groupingUsed) { return; }
     NumberFormat::setGroupingUsed(enabled); // to set field for compatibility
     fields->properties.groupingUsed = enabled;
     touchNoError();
@@ -382,7 +374,7 @@ void DecimalFormat::setParseIntegerOnly(UBool value) {
     if (fields == nullptr) {
         return;
     }
-    if (UBOOL_TO_BOOL(value) == fields->properties.parseIntegerOnly) { return; }
+    if (value == fields->properties.parseIntegerOnly) { return; }
     NumberFormat::setParseIntegerOnly(value); // to set field for compatibility
     fields->properties.parseIntegerOnly = value;
     touchNoError();
@@ -948,7 +940,7 @@ UBool DecimalFormat::isSignAlwaysShown() const {
 
 void DecimalFormat::setSignAlwaysShown(UBool value) {
     if (fields == nullptr) { return; }
-    if (UBOOL_TO_BOOL(value) == fields->properties.signAlwaysShown) { return; }
+    if (value == fields->properties.signAlwaysShown) { return; }
     fields->properties.signAlwaysShown = value;
     touchNoError();
 }
@@ -1157,7 +1149,7 @@ UBool DecimalFormat::isExponentSignAlwaysShown(void) const {
 
 void DecimalFormat::setExponentSignAlwaysShown(UBool expSignAlways) {
     if (fields == nullptr) { return; }
-    if (UBOOL_TO_BOOL(expSignAlways) == fields->properties.exponentSignAlwaysShown) { return; }
+    if (expSignAlways == fields->properties.exponentSignAlwaysShown) { return; }
     fields->properties.exponentSignAlwaysShown = expSignAlways;
     touchNoError();
 }
@@ -1233,7 +1225,7 @@ UBool DecimalFormat::isDecimalSeparatorAlwaysShown(void) const {
 
 void DecimalFormat::setDecimalSeparatorAlwaysShown(UBool newValue) {
     if (fields == nullptr) { return; }
-    if (UBOOL_TO_BOOL(newValue) == fields->properties.decimalSeparatorAlwaysShown) { return; }
+    if (newValue == fields->properties.decimalSeparatorAlwaysShown) { return; }
     fields->properties.decimalSeparatorAlwaysShown = newValue;
     touchNoError();
 }
@@ -1249,7 +1241,7 @@ UBool DecimalFormat::isDecimalPatternMatchRequired(void) const {
 
 void DecimalFormat::setDecimalPatternMatchRequired(UBool newValue) {
     if (fields == nullptr) { return; }
-    if (UBOOL_TO_BOOL(newValue) == fields->properties.decimalPatternMatchRequired) { return; }
+    if (newValue == fields->properties.decimalPatternMatchRequired) { return; }
     fields->properties.decimalPatternMatchRequired = newValue;
     touchNoError();
 }
@@ -1265,7 +1257,7 @@ UBool DecimalFormat::isParseNoExponent() const {
 
 void DecimalFormat::setParseNoExponent(UBool value) {
     if (fields == nullptr) { return; }
-    if (UBOOL_TO_BOOL(value) == fields->properties.parseNoExponent) { return; }
+    if (value == fields->properties.parseNoExponent) { return; }
     fields->properties.parseNoExponent = value;
     touchNoError();
 }
@@ -1281,7 +1273,7 @@ UBool DecimalFormat::isParseCaseSensitive() const {
 
 void DecimalFormat::setParseCaseSensitive(UBool value) {
     if (fields == nullptr) { return; }
-    if (UBOOL_TO_BOOL(value) == fields->properties.parseCaseSensitive) { return; }
+    if (value == fields->properties.parseCaseSensitive) { return; }
     fields->properties.parseCaseSensitive = value;
     touchNoError();
 }
@@ -1297,7 +1289,7 @@ UBool DecimalFormat::isFormatFailIfMoreThanMaxDigits() const {
 
 void DecimalFormat::setFormatFailIfMoreThanMaxDigits(UBool value) {
     if (fields == nullptr) { return; }
-    if (UBOOL_TO_BOOL(value) == fields->properties.formatFailIfMoreThanMaxDigits) { return; }
+    if (value == fields->properties.formatFailIfMoreThanMaxDigits) { return; }
     fields->properties.formatFailIfMoreThanMaxDigits = value;
     touchNoError();
 }

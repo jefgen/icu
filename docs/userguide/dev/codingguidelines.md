@@ -445,6 +445,24 @@ type `UBool` must be used in public APIs and in the definition of any persistent
 data structures. `UBool` is guaranteed to be one byte in size and signed; bool is
 not.
 
+Traditionally, ICU4C has defined its own FALSE=0 / TRUE=1 macros for use with UBool.
+Starting with ICU 68 (fall 2020), we no longer define these in public header files
+(unless U_DEFINE_FALSE_AND_TRUE=1),
+in order to avoid name collisions with code outside ICU defining enum constants and similar
+with these names.
+
+Instead, the versions of the C and C++ standards we require now do define type bool
+and values false & true, and we and our users can use these values.
+
+As of ICU 68, we are not changing ICU4C API from UBool to bool.
+Doing so in C API, or in structs that cross the library boundary,
+would break binary compatibility.
+Doing so only in other places in C++ could be confusingly inconsistent.
+We may revisit this.
+
+Note that the details of type bool (e.g., sizeof) depend on the compiler and
+may differ between C and C++.
+
 #### File Names (.h, .c, .cpp, data files if possible, etc.)
 
 Limit file names to 31 lowercase ASCII characters. (Older versions of MacOS have

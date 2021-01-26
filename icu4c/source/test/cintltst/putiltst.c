@@ -219,8 +219,10 @@ static void TestPUtilAPI(void){
         /*tzoffset=uprv_getUTCtime();*/
     }
 
-#if U_PLATFORM_USES_ONLY_WIN32_API 
-    log_verbose("Testing uprv_detectWindowsTimeZone() ....\n");
+#if U_PLATFORM_USES_ONLY_WIN32_API
+    // Note: This is just a basic test to ensure the API returns something other than NULL.
+    // There is more testing done by testDetectWindowsTimeZone in intltest.
+    log_verbose("Test calling uprv_detectWindowsTimeZone() ....\n");
     {
         const char* timezone = uprv_detectWindowsTimeZone();
         if (timezone == NULL) {
@@ -229,7 +231,7 @@ static void TestPUtilAPI(void){
             log_verbose("Detected TimeZone = %s\n", timezone);
         }   
     }
-#endif
+#endif // U_PLATFORM_USES_ONLY_WIN32_API
 }
 
 static void TestVersion(void)

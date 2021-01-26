@@ -42,6 +42,9 @@ private:
     void NaNE(void);
     void NaNNE(void);
 
+    // for testing the Windows time zone detection 
+    void testDetectWindowsTimeZone(void);
+
 };
  
 #endif

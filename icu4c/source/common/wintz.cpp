@@ -24,19 +24,58 @@
 #include "unicode/unistr.h"
 #include "uresimp.h"
 
-#ifndef WIN32_LEAN_AND_MEAN
-#   define WIN32_LEAN_AND_MEAN
-#endif
-#   define VC_EXTRALEAN
-#   define NOUSER
-#   define NOSERVICE
-#   define NOIME
-#   define NOMCX
-#include <windows.h>
-
 U_NAMESPACE_BEGIN
 
-// Note these constants and the struct are only used when dealing with the fallback path for RDP sesssions.
+static GetDynamicTimeZoneInformation_Fn *pGetDynamicTimeZoneInformation;
+static GetUserGeoID_Fn *pGetUserGeoID;
+static GetGeoInfoW_Fn *pGetGeoInfoW;
+
+// The following two functions are exported so that the tests can call them.
+U_CAPI void U_EXPORT2
+uprv_setWindowsTimeZoneTestFunctions(GetDynamicTimeZoneInformation_Fn *a, GetUserGeoID_Fn *b, GetGeoInfoW_Fn *c)
+{
+    pGetDynamicTimeZoneInformation = a;
+    pGetUserGeoID = b;
+    pGetGeoInfoW = c;
+}
+
+U_CAPI void U_EXPORT2
+uprv_clearWindowsTimeZoneTestFunctions()
+{
+    pGetDynamicTimeZoneInformation = nullptr;
+    pGetUserGeoID = nullptr;
+    pGetGeoInfoW = nullptr;
+}
+
+static DWORD uprv_GetDynamicTimeZoneInformation(PDYNAMIC_TIME_ZONE_INFORMATION pTimeZoneInformation)
+{
+    if (pGetDynamicTimeZoneInformation)
+    {
+        return (*pGetDynamicTimeZoneInformation)(pTimeZoneInformation);
+    }
+    return GetDynamicTimeZoneInformation(pTimeZoneInformation);
+}
+
+static GEOID uprv_GetUserGeoID(GEOCLASS GeoClass)
+{
+    if (pGetUserGeoID)
+    {
+        return (*pGetUserGeoID)(GeoClass);
+    }
+    return GetUserGeoID(GeoClass);
+}
+
+static int uprv_GetGeoInfoW(GEOID Location, GEOTYPE GeoType, LPWSTR lpGeoData, int cchData, LANGID LangId)
+{
+    if (pGetGeoInfoW)
+    {
+        return (*pGetGeoInfoW)(Location, GeoType, lpGeoData, cchData, LangId);
+    }
+    return GetGeoInfoW(Location, GeoType, lpGeoData, cchData, LangId);
+}
+
+
+// Note these constants and the struct are only used when dealing with the fallback path for RDP sessions.
 
 // This is the location of the time zones in the registry on Vista+ systems.
 // See: https://docs.microsoft.com/windows/win32/api/timezoneapi/ns-timezoneapi-dynamic_time_zone_information
@@ -93,7 +132,7 @@ uprv_detectWindowsTimeZone()
     SYSTEMTIME systemTimeAllZero;
     uprv_memset(&systemTimeAllZero, 0, sizeof(systemTimeAllZero));
 
-    if (GetDynamicTimeZoneInformation(&dynamicTZI) == TIME_ZONE_ID_INVALID) {
+    if (uprv_GetDynamicTimeZoneInformation(&dynamicTZI) == TIME_ZONE_ID_INVALID) {
         return nullptr;
     }
 
@@ -292,8 +331,8 @@ uprv_detectWindowsTimeZone()
     // as the A version of the API will end up calling MultiByteToWideChar anyways internally.
     wchar_t regionCodeW[3] = {};
     char regionCode[3] = {}; // 2 letter ISO 3166 country/region code made entirely of invariant chars.
-    int geoId = GetUserGeoID(GEOCLASS_NATION);
-    int regionCodeLen = GetGeoInfoW(geoId, GEO_ISO2, regionCodeW, UPRV_LENGTHOF(regionCodeW), 0);
+    int geoId = uprv_GetUserGeoID(GEOCLASS_NATION);
+    int regionCodeLen = uprv_GetGeoInfoW(geoId, GEO_ISO2, regionCodeW, UPRV_LENGTHOF(regionCodeW), 0);
 
     const UChar *icuTZ16 = nullptr;
     int32_t tzListLen = 0;

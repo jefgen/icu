@@ -10,6 +10,9 @@
 
 #include <float.h> // DBL_MAX, DBL_MIN
 #include "putilimp.h"
+#include "cmemory.h"
+#include "cstring.h"
+#include "cwchar.h"
 
 #if U_PLATFORM_USES_ONLY_WIN32_API
 #include "wintz.h"
@@ -562,6 +565,7 @@ PUtilTest::NaNNE(void)
 
 
 #if U_PLATFORM_USES_ONLY_WIN32_API
+
 static const struct DetectWinTZTestCase {
     DWORD dynamicTZI_return; 
     DYNAMIC_TIME_ZONE_INFORMATION dynamicTZI;
@@ -569,25 +573,36 @@ static const struct DetectWinTZTestCase {
     const WCHAR* regionCodeW;
     const char* expectedResult;
 } detectWinTZTestCases[] = {
-    {TIME_ZONE_ID_INVALID, {0}, 0, L""},
-    {TIME_ZONE_ID_INVALID, {480, L"Pacific Standard Time", {0, 11, 0, 1, 2, 0, 0, 0}, 0, L"Pacific Daylight Time", {0, 3, 0, 2, 2, 0, 0, 0}, -60, L"", 0}, 244, L"US", "America/Los_Angeles"},
+    {TIME_ZONE_ID_INVALID, {0}, 0, L"", nullptr},
+    {0, {480, L"Pacific Standard Time", {0, 11, 0, 1, 2, 0, 0, 0}, 0, L"Pacific Daylight Time", {0, 3, 0, 2, 2, 0, 0, 0}, -60, L"Pacific Standard Time", 0}, 244, L"US", "America/Los_Angeles"},
+    {0, {480, L"Pacific Standard Time", {0, 11, 0, 1, 2, 0, 0, 0}, 0, L"Pacific Daylight Time", {0, 3, 0, 2, 2, 0, 0, 0}, -60, L"Pacific Standard Time", 0}, 39, L"CA", "America/Vancouver"},
+    {0, {300, L"Eastern Standard Time", {0, 11, 0, 1, 2, 0, 0, 0}, 0, L"Eastern Daylight Time", {0, 3, 0, 2, 2, 0, 0, 0}, -60, L"Eastern Standard Time", 0}, 244, L"US", "America/New_York"},
+    {0, {-540, L"Tokyo Standard Time", {0, 0, 0, 0, 0, 0, 0, 0}, 0, L"Tokyo Daylight Time", {0, 0, 0, 0, 0, 0, 0, 0}, 0, L"Tokyo Standard Time", 0}, 122, L"JP", "Asia/Tokyo"},
+    {0, {120, L"UTC-02", {0, 0, 0, 0, 0, 0, 0, 0}, 0, L"UTC-02", {0, 0, 0, 0, 0, 0, 0, 0}, 0, L"UTC-02", 0}, 122, L"JP", "Etc/GMT+2"},
 };
 
-static const DetectWinTZTestCase* winTZtestCase;
+static const DetectWinTZTestCase* currentWinTZtestCase;
 
 DWORD WINAPI MockGetDynamicTimeZoneInformation(PDYNAMIC_TIME_ZONE_INFORMATION pTimeZoneInformation)
 {
-    return TIME_ZONE_ID_INVALID;
+    uprv_memcpy(pTimeZoneInformation, &currentWinTZtestCase->dynamicTZI, sizeof(currentWinTZtestCase->dynamicTZI));
+
+    return currentWinTZtestCase->dynamicTZI_return;
 }
 
 GEOID WINAPI MockGetUserGeoID(GEOCLASS /*GeoClass*/)
 {
-    return 0;
+    return currentWinTZtestCase->geoID;
 }
 
 int WINAPI MockGetGeoInfoW(GEOID Location, GEOTYPE /*GeoType*/, LPWSTR lpGeoData, int cchData, LANGID /*LangId*/)
 {
-    return 0;
+    if (lpGeoData == nullptr || currentWinTZtestCase->regionCodeW == nullptr || ((uprv_wcslen(currentWinTZtestCase->regionCodeW) + 1) > cchData))
+    {
+        return 0; // simulates the API returning failure.
+    }
+
+    uprv_wcscpy(lpGeoData, currentWinTZtestCase->regionCodeW);
 }
 
 #endif // U_PLATFORM_USES_ONLY_WIN32_API
@@ -605,11 +620,27 @@ void PUtilTest::testDetectWindowsTimeZone(void)
         logln("Detected TimeZone = %s\n", timezone);
     }
 
-    for (const auto& testCase : detectWinTZTestCases)
+    for (int i = 0; i < UPRV_LENGTHOF(detectWinTZTestCases); i++)
     {
-        winTZtestCase = &testCase;
+        currentWinTZtestCase = &detectWinTZTestCases[i];
 
         uprv_setWindowsTimeZoneTestFunctions(&MockGetDynamicTimeZoneInformation, &MockGetUserGeoID, &MockGetGeoInfoW);
+
+        const char* timezoneResult = uprv_detectWindowsTimeZone();
+
+        if (timezoneResult != nullptr)
+        {
+            if (uprv_strcmp(timezoneResult, currentWinTZtestCase->expectedResult) != 0) {
+                errln("FAIL: uprv_detectWindowsTimeZone() failed for test case %d. Got '%s' expected '%s'.", i,
+                      timezoneResult, currentWinTZtestCase->expectedResult);
+            } else {
+                logln("Got expected timezone = %s\n", timezoneResult);
+            }
+        } else {
+            if (currentWinTZtestCase->expectedResult != nullptr) {
+                errln("FAIL: uprv_detectWindowsTimeZone() failed, returned nullptr for test case %d.", i);
+            }
+        }
 
         uprv_clearWindowsTimeZoneTestFunctions();
     }

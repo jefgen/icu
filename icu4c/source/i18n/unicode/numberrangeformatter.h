@@ -66,28 +66,6 @@ class UFormattedNumberRangeData;
 class NumberRangeFormatterImpl;
 struct UFormattedNumberRangeImpl;
 
-} // namespace impl
-
-/**
- * \cond
- * Export an explicit template instantiation. See datefmt.h
- * (When building DLLs for Windows this is required.)
- */
-#if U_PLATFORM == U_PF_WINDOWS && !defined(U_IN_DOXYGEN)
-} // namespace icu::number
-U_NAMESPACE_END
-
-template struct U_I18N_API std::atomic< U_NAMESPACE_QUALIFIER number::impl::NumberRangeFormatterImpl*>;
-
-U_NAMESPACE_BEGIN
-namespace number {  // icu::number
-#endif
-/** \endcond */
-
-// Other helper classes would go here, but there are none.
-
-namespace impl {  // icu::number::impl
-
 // Do not enclose entire MacroProps with #ifndef U_HIDE_INTERNAL_API, needed for a protected field
 /** @internal */
 struct U_I18N_API RangeMacroProps : public UMemory {

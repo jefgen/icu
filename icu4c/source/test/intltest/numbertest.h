@@ -59,11 +59,14 @@ class NumberFormatterApiTest : public IntlTestWithFieldPosition {
     void notationCompact();
     void unitMeasure();
     void unitCompoundMeasure();
+    void unitArbitraryMeasureUnits();
     void unitSkeletons();
     void unitUsage();
     void unitUsageErrorCodes();
     void unitUsageSkeletons();
     void unitCurrency();
+    void unitInflections();
+    void unitGender();
     void unitPercent();
     void percentParity();
     void roundingFraction();
@@ -170,6 +173,20 @@ class NumberFormatterApiTest : public IntlTestWithFieldPosition {
       const FormattedNumber& formattedNumber,
       const UFieldPosition* expectedFieldPositions,
       int32_t length);
+
+    struct UnitInflectionTestCase {
+        const char *unitIdentifier;
+        const char *locale;
+        const char *unitDisplayCase;
+        double value;
+        const UChar *expected;
+    };
+
+    void runUnitInflectionsTestCases(UnlocalizedNumberFormatter unf,
+                                     UnicodeString skeleton,
+                                     const UnitInflectionTestCase *cases,
+                                     int32_t numCases,
+                                     IcuTestErrorCode &status);
 };
 
 class DecimalQuantityTest : public IntlTest {

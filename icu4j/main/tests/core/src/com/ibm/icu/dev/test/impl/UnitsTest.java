@@ -55,7 +55,31 @@ public class UnitsTest {
                 this.expected = expected;
                 this.accuracy = accuracy;
             }
+
+            void testATestCase(ComplexUnitsConverter converter) {
+                List<Measure> measures = converter.convert(value, null).measures;
+
+                assertEquals("measures length", expected.length, measures.size());
+                int i = 0;
+                for (Measure measure : measures) {
+                    double accuracy = 0.0;
+                    if (i == expected.length - 1) {
+                        accuracy = accuracy;
+                    }
+                    assertTrue("input " + value + ", output measure " + i + ": expected " +
+                                    expected[i] + ", expected unit " +
+                                    expected[i].getUnit() + " got unit " + measure.getUnit(),
+                            expected[i].getUnit().equals(measure.getUnit()));
+                    assertEquals("input " + value + ", output measure " + i + ": expected " +
+                                    expected[i] + ", expected number " +
+                                    expected[i].getNumber() + " got number " + measure.getNumber(),
+                            expected[i].getNumber().doubleValue(),
+                            measure.getNumber().doubleValue(), accuracy);
+                    i++;
+                }
+            }
         }
+
         TestCase[] testCases = new TestCase[] {
             // Significantly less than 2.0.
             new TestCase(
@@ -129,35 +153,21 @@ public class UnitsTest {
                          0),
         };
 
+
         ConversionRates rates = new ConversionRates();
         MeasureUnit input, output;
-        List<Measure> measures;
         for (TestCase testCase : testCases) {
             input = MeasureUnit.forIdentifier(testCase.input);
             output = MeasureUnit.forIdentifier(testCase.output);
             final MeasureUnitImpl inputImpl = MeasureUnitImpl.forIdentifier(input.getIdentifier());
             final MeasureUnitImpl outputImpl = MeasureUnitImpl.forIdentifier(output.getIdentifier());
-            ComplexUnitsConverter converter = new ComplexUnitsConverter(inputImpl, outputImpl, rates);
-            measures = converter.convert(testCase.value, null).measures;
+            ComplexUnitsConverter converter1 = new ComplexUnitsConverter(inputImpl, outputImpl, rates);
 
-            assertEquals("measures length", testCase.expected.length, measures.size());
-            int i = 0;
-            for (Measure measure : measures) {
-                double accuracy = 0.0;
-                if (i == testCase.expected.length - 1) {
-                    accuracy = testCase.accuracy;
-                }
-                assertTrue("input " + testCase.value + ", output measure " + i + ": expected " +
-                               testCase.expected[i] + ", expected unit " +
-                               testCase.expected[i].getUnit() + " got unit " + measure.getUnit(),
-                           testCase.expected[i].getUnit().equals(measure.getUnit()));
-                assertEquals("input " + testCase.value + ", output measure " + i + ": expected " +
-                                 testCase.expected[i] + ", expected number " +
-                                 testCase.expected[i].getNumber() + " got number " + measure.getNumber(),
-                             testCase.expected[i].getNumber().doubleValue(),
-                             measure.getNumber().doubleValue(), accuracy);
-                i++;
-            }
+            testCase.testATestCase(converter1);
+
+            // Test ComplexUnitsConverter created with CLDR units identifiers.
+            ComplexUnitsConverter converter2 = new ComplexUnitsConverter(testCase.input, testCase.output);
+            testCase.testATestCase(converter2);
         }
 
         // TODO(icu-units#63): test negative numbers!
@@ -165,7 +175,7 @@ public class UnitsTest {
 
 
     @Test
-    public void testComplexUnitConverterSorting() {
+    public void testComplexUnitsConverterSorting() {
         class TestCase {
             String message;
             String inputUnit;
@@ -361,14 +371,14 @@ public class UnitsTest {
     @Test
     public void testConverter() {
         class TestData {
-            MeasureUnitImpl source;
-            MeasureUnitImpl target;
-            BigDecimal input;
-            BigDecimal expected;
+            final String sourceIdentifier;
+            final String targetIdentifier;
+            final BigDecimal input;
+            final BigDecimal expected;
 
-            TestData(String source, String target, double input, double expected) {
-                this.source = MeasureUnitImpl.UnitsParser.parseForIdentifier(source);
-                this.target = MeasureUnitImpl.UnitsParser.parseForIdentifier(target);
+            TestData(String sourceIdentifier, String targetIdentifier, double input, double expected) {
+                this.sourceIdentifier = sourceIdentifier;
+                this.targetIdentifier = targetIdentifier;
                 this.input = BigDecimal.valueOf(input);
                 this.expected = BigDecimal.valueOf(expected);
             }
@@ -430,23 +440,48 @@ public class UnitsTest {
 
         ConversionRates conversionRates = new ConversionRates();
         for (TestData test : tests) {
-            UnitsConverter converter = new UnitsConverter(test.source, test.target, conversionRates);
+            MeasureUnitImpl source = MeasureUnitImpl.forIdentifier(test.sourceIdentifier);
+            MeasureUnitImpl target = MeasureUnitImpl.forIdentifier(test.targetIdentifier);
+
+            UnitsConverter converter = new UnitsConverter(source, target, conversionRates);
 
             double maxDelta = 1e-6 * Math.abs(test.expected.doubleValue());
             if (test.expected.doubleValue() == 0) {
                 maxDelta = 1e-12;
             }
-            assertEquals("testConverter: " + test.source + " to " + test.target,
-                         test.expected.doubleValue(), converter.convert(test.input).doubleValue(),
-                         maxDelta);
+            assertEquals("testConverter: " + test.sourceIdentifier + " to " + test.targetIdentifier,
+                    test.expected.doubleValue(), converter.convert(test.input).doubleValue(),
+                    maxDelta);
 
             maxDelta = 1e-6 * Math.abs(test.input.doubleValue());
             if (test.input.doubleValue() == 0) {
                 maxDelta = 1e-12;
             }
-            assertEquals("testConverter inverse: " + test.target + " back to " + test.source,
-                         test.input.doubleValue(), converter.convertInverse(test.expected).doubleValue(),
-                         maxDelta);
+            assertEquals(
+                    "testConverter inverse: " + test.targetIdentifier + " back to " + test.sourceIdentifier,
+                    test.input.doubleValue(), converter.convertInverse(test.expected).doubleValue(),
+                    maxDelta);
+
+
+            // TODO: Test UnitsConverter created using CLDR separately.
+            // Test UnitsConverter created by CLDR unit identifiers
+            UnitsConverter converter2 = new UnitsConverter(test.sourceIdentifier, test.targetIdentifier);
+
+            maxDelta = 1e-6 * Math.abs(test.expected.doubleValue());
+            if (test.expected.doubleValue() == 0) {
+                maxDelta = 1e-12;
+            }
+            assertEquals("testConverter2: " + test.sourceIdentifier + " to " + test.targetIdentifier,
+                    test.expected.doubleValue(), converter2.convert(test.input).doubleValue(),
+                    maxDelta);
+
+            maxDelta = 1e-6 * Math.abs(test.input.doubleValue());
+            if (test.input.doubleValue() == 0) {
+                maxDelta = 1e-12;
+            }
+            assertEquals("testConverter2 inverse: " + test.targetIdentifier + " back to " + test.sourceIdentifier,
+                    test.input.doubleValue(), converter2.convertInverse(test.expected).doubleValue(),
+                    maxDelta);
         }
     }
 
@@ -611,8 +646,7 @@ public class UnitsTest {
             }
         }
 
-        for (TestCase testCase :
-                tests) {
+        for (TestCase testCase : tests) {
             UnitsRouter router = new UnitsRouter(testCase.inputUnit.second, testCase.region, testCase.usage);
             List<Measure> measures = router.route(testCase.input, null).complexConverterResult.measures;
 
@@ -626,10 +660,32 @@ public class UnitsTest {
                 if (!UnitsTest
                         .compareTwoBigDecimal(testCase.expectedInOrder.get(i),
                                 BigDecimal.valueOf(measures.get(i).getNumber().doubleValue()),
-                                BigDecimal.valueOf(0.00001))) {
+                                BigDecimal.valueOf(0.0000000001))) {
                     fail("Test failed: " + testCase + "; Got unexpected result: " + measures);
                 }
             }
         }
+
+        // Test UnitsRouter created with CLDR units identifiers.
+        for (TestCase testCase : tests) {
+            UnitsRouter router = new UnitsRouter(testCase.inputUnit.first, testCase.region, testCase.usage);
+            List<Measure> measures = router.route(testCase.input, null).complexConverterResult.measures;
+
+            assertEquals("Measures size must be the same as expected units",
+                    measures.size(), testCase.expectedInOrder.size());
+            assertEquals("Measures size must be the same as output units",
+                    measures.size(), testCase.outputUnitInOrder.size());
+
+
+            for (int i = 0; i < measures.size(); i++) {
+                if (!UnitsTest
+                        .compareTwoBigDecimal(testCase.expectedInOrder.get(i),
+                                BigDecimal.valueOf(measures.get(i).getNumber().doubleValue()),
+                                BigDecimal.valueOf(0.0000000001))) {
+                    fail("Test failed: " + testCase + "; Got unexpected result: " + measures);
+                }
+            }
+        }
+
     }
 }

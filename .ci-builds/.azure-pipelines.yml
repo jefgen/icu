@@ -351,32 +351,48 @@ jobs:
     vmImage: 'vs2017-win2016'
     demands:
       - Cmd
+  variables:
+    MSYS2_INSTALL: c:\tools\msys64
   steps:
     - checkout: self
       lfs: true
       fetchDepth: 10
+    - task: Cache@2
+      displayName: 'Restore MSYS2 install'
+      inputs:
+        key: msys2-install
+        path: "$(MSYS2_INSTALL)"
+        cacheHitVar: CACHE_RESTORED
+    # Perform a new install of MSYS2 if we didn't restore from the cache.
     - script: |
-       choco install -y msys2
-       rem refreshenv
+        choco install -y msys2
+        rem refreshenv
       displayName: 'Install MSYS2'
+      condition: eq(variables.CACHE_RESTORED, 'false')
     - script: |
-       c:\tools\msys64\usr\bin\bash.exe -lc "echo 'Hello World' && uname -a"
-       c:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S mingw-w64-x86_64-toolchain"
-       c:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S make"
-       exit
+        c:\tools\msys64\usr\bin\bash.exe -lc "echo 'Hello World' && uname -a"
+        c:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S mingw-w64-x86_64-toolchain"
+        c:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S make"
+        exit
       displayName: 'Install mingw-w64-x86_64-toolchain'
+      condition: eq(variables.CACHE_RESTORED, 'false')
+    # If we restored from the cache, attempt an update so the cache doesn't become stale over time.
     - script: |
-       set MSYSTEM=MINGW64
-       c:\tools\msys64\usr\bin\bash.exe -lc "cd $BUILD_SOURCESDIRECTORY && cd icu4c/source && ./runConfigureICU MinGW --prefix='/tmp/build-icu' && make -j2 check"
+        c:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Syuu"
+        exit
+      condition: eq(variables.CACHE_RESTORED, 'true')
+    - script: |
+        set MSYSTEM=MINGW64
+        c:\tools\msys64\usr\bin\bash.exe -lc "cd $BUILD_SOURCESDIRECTORY && cd icu4c/source && ./runConfigureICU MinGW --prefix='/tmp/build-icu' && make -j2 check"
       displayName: 'Build and Test'
     - script: |
-       set MSYSTEM=MINGW64
-       c:\tools\msys64\usr\bin\bash.exe -lc "cd $BUILD_SOURCESDIRECTORY && cd icu4c/source && make install && cd /tmp/build-icu && echo 'Recursive ls' && ls -lR"
+        set MSYSTEM=MINGW64
+        c:\tools\msys64\usr\bin\bash.exe -lc "cd $BUILD_SOURCESDIRECTORY && cd icu4c/source && make install && cd /tmp/build-icu && echo 'Recursive ls' && ls -lR"
       displayName: 'make install'
     - script: |
-       set MSYSTEM=MINGW64
-       c:\tools\msys64\usr\bin\bash.exe -lc "echo 'Run icuinfo from MSYS shell' && cd /tmp/build-icu/bin && ./icuinfo.exe"
-       echo 'Run icuinfo from CMD shell' && cd /d C:\tools\msys64\tmp\build-icu\bin && set PATH=C:\tools\msys64\mingw64\bin;%PATH% && icuinfo.exe"
+        set MSYSTEM=MINGW64
+        c:\tools\msys64\usr\bin\bash.exe -lc "echo 'Run icuinfo from MSYS shell' && cd /tmp/build-icu/bin && ./icuinfo.exe"
+        echo 'Run icuinfo from CMD shell' && cd /d C:\tools\msys64\tmp\build-icu\bin && set PATH=C:\tools\msys64\mingw64\bin;%PATH% && icuinfo.exe"
       displayName: 'run icuinfo'
 #-------------------------------------------------------------------------
 - job: ICU4C_Clang_MacOSX_WarningsAsErrors

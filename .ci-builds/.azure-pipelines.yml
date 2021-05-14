@@ -90,6 +90,10 @@ jobs:
     - checkout: self
       lfs: true
       fetchDepth: 10
+    # Work around https://github.com/actions/virtual-environments/issues/3376
+    - script: |
+        sudo apt remove libgcc-11-dev gcc-11
+      displayName: Remove GCC 11
     - script: |
         export CXXFLAGS="-std=c++14 -Winvalid-constexpr" && cd icu4c/source && ./runConfigureICU --enable-debug --disable-release Linux && make -j2 check
       displayName: 'Build and Test C++14'

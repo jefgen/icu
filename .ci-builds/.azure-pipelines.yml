@@ -81,11 +81,11 @@ jobs:
         CC: clang
         CXX: clang++
 #-------------------------------------------------------------------------
-- job: ICU4C_Clang_Cpp14_Debug_Ubuntu_1804
-  displayName: 'C: Linux Clang C++14 Debug (Ubuntu 18.04)'
+- job: ICU4C_Clang_Cpp14_Debug_Ubuntu_2004
+  displayName: 'C: Linux Clang C++14 Debug (Ubuntu 20.04)'
   timeoutInMinutes: 30
   pool:
-    vmImage: 'ubuntu-18.04'
+    vmImage: 'ubuntu-20.04'
   steps:
     - checkout: self
       lfs: true

@@ -10,6 +10,7 @@ on:
     branches:
       - main
       - 'maint/maint*'
+      - 'user/jefgen/*'
   pull_request:
     branches: '**'
 
@@ -43,6 +44,30 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
+      - name: ICU4J
+        run: |
+          cd icu4j;
+          ant init;
+          ant check;
+      - name: List failures (if any)
+        run: |
+          [ -d icu4j/out/junit-results ] && cd icu4j && cat `find out/junit-results -name "*.txt" -exec grep -l FAILED {} \;`;
+        if: ${{ failure() }}
+
+  # ICU4J Java 7 build and unit test
+  icu4j-java7-build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout and setup
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      - name: Checkout lfs objects
+        run: git lfs pull
+      - uses: actions/setup-java@v1
+        with:
+          distribution: 'zulu'
+          java-version: '7'
       - name: ICU4J
         run: |
           cd icu4j;
